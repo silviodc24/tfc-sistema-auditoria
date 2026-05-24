@@ -1,0 +1,19 @@
+id_aquisicao,data_solicitacao,data_aprovacao,valor,descricao,tipo_aquisicao,documento_referencia,status_aprovacao,origem_dado,confirmacao_recepcao,id_solicitante,id_aprovador,id_centro,id_orcamento
+1,2025-01-10,2025-01-12,250000.00,Aquisicao de licencas de software de seguranca,bem,REQ-2025-001,aprovado,csv,1,18,14,1,1
+2,2025-01-15,2025-01-18,750000.00,Servico de consultoria em ciberseguranca,servico,REQ-2025-002,aprovado,csv,1,14,10,1,1
+3,2025-01-20,2025-01-25,1500000.00,Aquisicao de servidores para datacenter,bem,REQ-2025-003,aprovado,csv,1,10,6,1,1
+4,2025-02-01,2025-02-05,6000000.00,Renovacao de infraestrutura de rede,bem,REQ-2025-004,aprovado,csv,1,6,2,1,1
+5,2025-02-10,2025-02-14,180000.00,Material de escritorio para equipa comercial,bem,REQ-2025-005,aprovado,csv,1,19,15,2,2
+6,2025-02-15,2025-02-20,600000.00,Servico de design grafico para campanha,servico,REQ-2025-006,aprovado,csv,1,15,11,2,2
+7,2025-03-10,2025-03-15,320000.00,Equipamento de limpeza e manutencao,bem,REQ-2025-007,aprovado,csv,1,18,16,3,3
+8,2025-04-01,2025-04-05,450000.00,Software de contabilidade e gestao financeira,bem,REQ-2025-008,aprovado,csv,1,19,17,4,4
+9,2025-05-02,2025-05-06,9000000.00,Desenvolvimento de plataforma cloud proprietaria,servico,REQ-2025-009,aprovado,csv,1,6,2,1,1
+10,2025-05-08,2025-05-10,6500000.00,Implementacao de sistema de videovigilancia,bem,REQ-2025-010,aprovado,csv,1,10,11,3,3
+11,2025-05-09,2025-05-11,450000.00,Licencas de antivirus corporativo,bem,REQ-2025-011,aprovado,csv,1,14,14,1,1
+12,2025-05-11,2025-05-13,550000.00,Aquisicao de mobiliario de escritorio,bem,,aprovado,csv,1,16,12,3,3
+13,2025-05-12,2025-05-14,700000.00,Servico de formacao e desenvolvimento,servico,REQ-2025-013,aprovado,csv,0,17,13,4,4
+14,2025-05-14,2025-05-10,480000.00,Aquisicao de equipamento audiovisual,bem,REQ-2025-014,aprovado,csv,1,19,15,2,2
+15,2025-05-15,2025-05-18,820000.00,Servico de consultoria de gestao,servico,,aprovado,csv,1,13,13,4,4
+16,2025-05-16,2025-05-19,7500000.00,Aquisicao de equipamento de datacenter,bem,REQ-2025-016,aprovado,csv,0,10,11,1,1
+17,2025-05-17,2025-05-20,350000.00,Servico de manutencao de ar condicionado,servico,,aprovado,csv,1,16,16,3,3
+18,2025-05-18,2025-05-14,2500000.00,Plataforma de gestao documental,servico,,aprovado,csv,0,13,13,4,4

@@ -110,3 +110,22 @@ VALUES
  'O sistema deve permitir a geração de relatórios contendo as não conformidades detectadas e respectivas evidências.',
  'relatorio', 'nao_nulo', NULL, 'integridade', 'media');
  
+ 
+ -- =============================================================================
+-- LIMIARES DE AUTORIZAÇÃO
+-- Configuração inicial para RN05 e RN06.
+-- Valores fictícios para a Empresa NS Aplicação.
+-- Ajustáveis pelo administrador via interface.
+-- =============================================================================
+INSERT INTO limiar_autorizacao (id_regra, valor_minimo, valor_maximo, nivel_minimo)
+SELECT id_regra, 0.00, 499999.99, 2
+FROM regra_auditoria WHERE codigo = 'RN05'
+UNION ALL
+SELECT id_regra, 500000.00, 999999.99, 3
+FROM regra_auditoria WHERE codigo = 'RN05'
+UNION ALL
+SELECT id_regra, 1000000.00, 4999999.99, 4
+FROM regra_auditoria WHERE codigo = 'RN05'
+UNION ALL
+SELECT id_regra, 5000000.00, NULL, 5
+FROM regra_auditoria WHERE codigo = 'RN05';

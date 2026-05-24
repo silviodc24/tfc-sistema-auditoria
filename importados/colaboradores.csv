@@ -1,0 +1,21 @@
+id_colaborador,nome,email,nivel_hierarquico,ativo
+1,Antonio Ferreira da Silva,antonio.silva@ns-aplicacao.ao,6,1
+2,Maria Joao Cardoso,maria.cardoso@ns-aplicacao.ao,5,1
+3,Carlos Eduardo Mendes,carlos.mendes@ns-aplicacao.ao,5,1
+4,Ana Beatriz Lopes,ana.lopes@ns-aplicacao.ao,5,1
+5,Pedro Augusto Nunes,pedro.nunes@ns-aplicacao.ao,5,1
+6,Joana Isabel Rodrigues,joana.rodrigues@ns-aplicacao.ao,4,1
+7,Miguel Antonio Santos,miguel.santos@ns-aplicacao.ao,4,1
+8,Carla Filomena Costa,carla.costa@ns-aplicacao.ao,4,1
+9,Bruno Alexandre Teixeira,bruno.teixeira@ns-aplicacao.ao,4,1
+10,Ines Margarida Oliveira,ines.oliveira@ns-aplicacao.ao,3,1
+11,Rui Filipe Goncalves,rui.goncalves@ns-aplicacao.ao,3,1
+12,Sofia Raquel Martins,sofia.martins@ns-aplicacao.ao,3,1
+13,Luis Fernando Araujo,luis.araujo@ns-aplicacao.ao,3,1
+14,Catarina Susana Pinto,catarina.pinto@ns-aplicacao.ao,2,1
+15,David Manuel Sousa,david.sousa@ns-aplicacao.ao,2,1
+16,Filipa Alexandra Matos,filipa.matos@ns-aplicacao.ao,2,1
+17,Hugo Miguel Carvalho,hugo.carvalho@ns-aplicacao.ao,2,1
+18,Leonor Cristina Barbosa,leonor.barbosa@ns-aplicacao.ao,1,1
+19,Marco Paulo Ribeiro,marco.ribeiro@ns-aplicacao.ao,1,1
+20,Natacha Vanessa Correia,natacha.correia@ns-aplicacao.ao,1,0
