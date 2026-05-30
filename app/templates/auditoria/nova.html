@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Nova Auditoria{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Nova Sessão de Auditoria</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="id_utilizador" class="form-label">Auditor Responsável</label>
+                        <select class="form-select" id="id_utilizador" name="id_utilizador" required>
+                            <option value="">Seleccione o auditor</option>
+                            {% for u in utilizadores %}
+                                <option value="{{ u.id_utilizador }}">{{ u.nome }} — {{ u.perfil }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="periodo" class="form-label">Período a Auditar</label>
+                        <input type="text"
+                               class="form-control"
+                               id="periodo"
+                               name="periodo"
+                               placeholder="Ex: 2025"
+                               required>
+                        <div class="form-text">Introduza o ano do período orçamental a auditar.</div>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-play-circle"></i> Executar Auditoria
+                        </button>
+                        <a href="{{ url_for('auditoria.index') }}" class="btn btn-outline-secondary">
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

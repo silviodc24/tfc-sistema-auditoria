@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Auditorias{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-clipboard-check"></i> Sessões de Auditoria</h2>
+    <a href="{{ url_for('auditoria.nova') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Nova Auditoria
+    </a>
+</div>
+
+{% if auditorias %}
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Período</th>
+                    <th>Data de Execução</th>
+                    <th>Total Aquisições</th>
+                    <th>Não Conformidades</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in auditorias %}
+                <tr>
+                    <td>{{ a.id_auditoria }}</td>
+                    <td>{{ a.periodo_analisado }}</td>
+                    <td>{{ a.data_execucao.strftime('%d/%m/%Y %H:%M') }}</td>
+                    <td>{{ a.total_transacoes }}</td>
+                    <td>
+                        {% if a.total_nao_conformidades > 0 %}
+                            <span class="badge bg-danger">{{ a.total_nao_conformidades }}</span>
+                        {% else %}
+                            <span class="badge bg-success">0</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if a.status == 'concluida' %}
+                            <span class="badge bg-success">Concluída</span>
+                        {% elif a.status == 'em_curso' %}
+                            <span class="badge bg-warning text-dark">Em curso</span>
+                        {% else %}
+                            <span class="badge bg-danger">Erro</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('auditoria.detalhe', id=a.id_auditoria) }}"
+                           class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-eye"></i> Ver
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="bi bi-info-circle"></i> Ainda não existem sessões de auditoria. Cria a primeira.
+</div>
+{% endif %}
+{% endblock %}

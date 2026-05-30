@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Auditoria {{ auditoria.id_auditoria }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-clipboard-check"></i> Auditoria #{{ auditoria.id_auditoria }}</h2>
+    <a href="{{ url_for('auditoria.index') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Voltar
+    </a>
+</div>
+
+<!-- RESUMO DA AUDITORIA -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            <div class="fs-1 text-primary">{{ auditoria.periodo_analisado }}</div>
+            <small class="text-muted">Período Analisado</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            <div class="fs-1 text-primary">{{ auditoria.total_transacoes }}</div>
+            <small class="text-muted">Total de Aquisições</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            <div class="fs-1 text-danger">{{ auditoria.total_nao_conformidades }}</div>
+            <small class="text-muted">Não Conformidades</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            {% if auditoria.status == 'concluida' %}
+                <div class="fs-1 text-success"><i class="bi bi-check-circle"></i></div>
+                <small class="text-muted">Concluída</small>
+            {% elif auditoria.status == 'em_curso' %}
+                <div class="fs-1 text-warning"><i class="bi bi-hourglass"></i></div>
+                <small class="text-muted">Em Curso</small>
+            {% else %}
+                <div class="fs-1 text-danger"><i class="bi bi-x-circle"></i></div>
+                <small class="text-muted">Erro</small>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- RESULTADO POR AQUISICAO -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-list-check"></i> Resultado por Aquisição</h5>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Aquisição</th>
+                    <th>Descrição</th>
+                    <th>Valor (Kz)</th>
+                    <th>Resultado</th>
+                    <th>Não Conformidades</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for aa in auditoria.avaliacoes %}
+                <tr>
+                    <td>#{{ aa.aquisicao.id_aquisicao }}</td>
+                    <td>{{ aa.aquisicao.descricao }}</td>
+                    <td>{{ "{:,.2f}".format(aa.aquisicao.valor) }}</td>
+                    <td>
+                        {% if aa.resultado == 'conforme' %}
+                            <span class="badge bg-success">Conforme</span>
+                        {% elif aa.resultado == 'nao_conforme' %}
+                            <span class="badge bg-danger">Não Conforme</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">Inconclusivo</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if aa.nao_conformidades %}
+                            <ul class="mb-0 ps-3">
+                                {% for nc in aa.nao_conformidades %}
+                                    <li>
+                                        <span class="badge badge-{{ nc.gravidade }}">
+                                            {{ nc.gravidade }}
+                                        </span>
+                                        {{ nc.descricao }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, app
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from dotenv import load_dotenv
@@ -18,6 +18,9 @@ def create_app():
 
     from app.routes.main import main
     app.register_blueprint(main)
+
+    from app.routes.auditoria import auditoria_bp
+    app.register_blueprint(auditoria_bp)
 
     from app import models
 

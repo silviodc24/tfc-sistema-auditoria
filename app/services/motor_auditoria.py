@@ -69,19 +69,27 @@ DESCRICOES_VIOLACAO = {
 # =============================================================================
 
 def buscar_saldo_disponivel(aquisicao):
-    """Calcula o saldo disponivel no orcamento da aquisicao."""
+    """
+    Calcula o saldo disponivel no momento em que a aquisicao foi aprovada.
+    Considera apenas as aquisicoes aprovadas anteriormente — ordem cronologica.
+    """
     orcamento = Orcamento.query.get(aquisicao.id_orcamento)
     if not orcamento:
         return None
-    # Soma todas as aquisicoes ja auditadas neste orcamento
-    total_executado = db.session.query(
+
+    # Soma das aquisicoes aprovadas antes desta — mesma ordem cronologica
+    total_anteriores = db.session.query(
         db.func.sum(Aquisicao.valor)
     ).filter(
         Aquisicao.id_orcamento == aquisicao.id_orcamento,
         Aquisicao.id_aquisicao != aquisicao.id_aquisicao,
-        Aquisicao.status_aprovacao == 'aprovado'
+        Aquisicao.status_aprovacao == 'aprovado',
+        Aquisicao.data_aprovacao <= aquisicao.data_aprovacao
     ).scalar() or Decimal('0')
-    return orcamento.valor_orcado - total_executado
+
+    # Saldo = orcado - executado historico do ERP - aquisicoes anteriores deste periodo
+    saldo = orcamento.valor_orcado - orcamento.valor_executado - total_anteriores
+    return saldo
 
 
 def buscar_limiar(id_regra, valor):

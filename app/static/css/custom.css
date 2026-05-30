@@ -1,0 +1,25 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.navbar-brand {
+    font-size: 1.2rem;
+    letter-spacing: 0.5px;
+}
+
+.footer {
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border-radius: 10px;
+}
+
+.badge-critica { background-color: #dc3545; }
+.badge-alta    { background-color: #fd7e14; }
+.badge-media   { background-color: #ffc107; color: #000; }
+.badge-baixa   { background-color: #198754; }
