@@ -179,18 +179,22 @@ def avaliar_regra(aquisicao, regra, regra_rn05):
 # MOTOR PRINCIPAL
 # =============================================================================
 
-def executar_auditoria(auditoria, periodo):
+def executar_auditoria(auditoria, ids_aquisicao):
     """
     Executa uma sessao de auditoria completa.
-    Analisa todas as aquisicoes do periodo e aplica todas as regras activas.
+    Analisa apenas as aquisicoes cujos IDs foram seleccionados pelo auditor.
     """
     try:
+        # Busca todas as regras activas
         regras = RegraAuditoria.query.filter_by(ativa=True).all()
+
+        # Busca a regra RN05 para usar nos limiares de RN05 e RN06
         regra_rn05 = RegraAuditoria.query.filter_by(codigo='RN05').first()
 
-        aquisicoes = Aquisicao.query.join(Orcamento).filter(
-            Orcamento.periodo == periodo
-        ).all()
+        # Busca apenas as aquisicoes seleccionadas pelo auditor
+        aquisicoes = Aquisicao.query.filter(
+            Aquisicao.id_aquisicao.in_(ids_aquisicao)
+        ).order_by(Aquisicao.data_aprovacao.asc()).all()
 
         total_transacoes = len(aquisicoes)
         total_nao_conformidades = 0
@@ -213,7 +217,7 @@ def executar_auditoria(auditoria, periodo):
                 resultado=resultado
             )
             db.session.add(aa)
-            db.session.flush()  # Gera o id_auditoria_aquisicao
+            db.session.flush()
 
             # PASSO 3 — Regista cada nao conformidade com o id correcto
             if violacoes:
@@ -223,6 +227,7 @@ def executar_auditoria(auditoria, periodo):
                         aa.id_auditoria_aquisicao, regra, descricao
                     )
 
+        # Actualiza os totais da auditoria
         auditoria.total_transacoes = total_transacoes
         auditoria.total_nao_conformidades = total_nao_conformidades
         auditoria.status = 'concluida'

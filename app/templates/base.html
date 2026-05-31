@@ -10,64 +10,102 @@
 </head>
 <body class="bg-light">
 
-    <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="{{ url_for('main.index') }}">
-                <i class="bi bi-shield-check"></i> NS Auditoria
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+    <!-- SIDEBAR -->
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <button id="toggleSidebar" class="btn text-white p-0">
+                <i class="bi bi-list fs-4"></i>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auditoria.index') }}">
-                            <i class="bi bi-clipboard-check"></i> Auditorias
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="bi bi-exclamation-triangle"></i> Não Conformidades
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="bi bi-gear"></i> Configuração
-                        </a>
-                    </li>
-                </ul>
-            </div>
+            <span class="logo-text ms-2">
+                <i class="bi bi-shield-check"></i> NS Auditoria
+            </span>
         </div>
-    </nav>
 
-    <!-- MENSAGENS FLASH -->
-    <div class="container mt-3">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+        <ul class="nav flex-column mt-4">
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'main.index' %}active{% endif %}"
+                   href="{{ url_for('main.index') }}">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'auditoria' in request.endpoint %}active{% endif %}"
+                   href="{{ url_for('auditoria.index') }}">
+                    <i class="bi bi-clipboard-check"></i>
+                    <span>Auditorias</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'aquisicao' in request.endpoint %}active{% endif %}"
+                   href="{{ url_for('aquisicao.index') }}">
+                    <i class="bi bi-bag-check"></i>
+                    <span>Aquisições</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'nao_conformidade' in request.endpoint %}active{% endif %}"
+                   href="#">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <span>Não Conformidades</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'configuracao' in request.endpoint %}active{% endif %}"
+                   href="#">
+                    <i class="bi bi-gear"></i>
+                    <span>Configuração</span>
+                </a>
+            </li>
+        </ul>
     </div>
 
     <!-- CONTEUDO PRINCIPAL -->
-    <div class="container mt-4">
-        {% block content %}{% endblock %}
+    <div id="main-content">
+
+        <!-- MENSAGENS FLASH -->
+        <div class="container-fluid px-4 mt-3">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        <!-- PAGINA -->
+        <div class="container-fluid px-4 mt-3">
+            {% block content %}{% endblock %}
+        </div>
+
+        <!-- FOOTER -->
+        <footer class="footer mt-5 py-3 bg-white border-top">
+            <div class="container-fluid px-4 text-muted">
+                <small>Sistema de Auditoria de Conformidade — NS Aplicação © 2025</small>
+            </div>
+        </footer>
+
     </div>
 
-    <!-- FOOTER -->
-    <footer class="footer mt-5 py-3 bg-white border-top">
-        <div class="container text-center text-muted">
-            <small>Sistema de Auditoria de Conformidade — NS Aplicação © 2025</small>
-        </div>
-    </footer>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const sidebar = document.getElementById("sidebar");
+            const content = document.getElementById("main-content");
+            const toggle = document.getElementById("toggleSidebar");
+
+            toggle.addEventListener("click", function () {
+                sidebar.classList.toggle("collapsed");
+                content.classList.toggle("expanded");
+            });
+        });
+    </script>
+
     {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -22,6 +22,9 @@ def create_app():
     from app.routes.auditoria import auditoria_bp
     app.register_blueprint(auditoria_bp)
 
+    from app.routes.aquisicao import aquisicao_bp
+    app.register_blueprint(aquisicao_bp)
+
     from app import models
 
     return app

@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from app import db
 from app.models.auditoria import Auditoria
+from app.models.aquisicao import Aquisicao
 from app.models.utilizador import Utilizador
 from app.services.motor_auditoria import executar_auditoria
 
@@ -13,19 +14,44 @@ def index():
     auditorias = Auditoria.query.order_by(Auditoria.data_execucao.desc()).all()
     return render_template('auditoria/index.html', auditorias=auditorias)
 
+@auditoria_bp.route('/iniciar')
+def iniciar():
+    """Redireciona para aquisicoes com mensagem a pedir seleccao."""
+    flash('Seleccione as aquisições que pretende auditar.', 'info')
+    return redirect(url_for('aquisicao.index'))
 
 @auditoria_bp.route('/nova', methods=['GET', 'POST'])
 def nova():
-    """Cria e executa uma nova sessao de auditoria."""
+    """Confirmacao e execucao de uma nova sessao de auditoria."""
     utilizadores = Utilizador.query.filter_by(ativo=True).all()
 
-    if request.method == 'POST':
-        id_utilizador = request.form.get('id_utilizador')
-        periodo = request.form.get('periodo')
+    # Recebe os IDs seleccionados na pagina de aquisicoes
+    ids_aquisicao = request.form.getlist(
+        'ids_aquisicao') or request.args.getlist('ids_aquisicao')
 
-        if not id_utilizador or not periodo:
-            flash('Preencha todos os campos.', 'danger')
-            return render_template('auditoria/nova.html', utilizadores=utilizadores)
+    # Carrega as aquisicoes seleccionadas para mostrar no formulario de confirmacao
+    aquisicoes_seleccionadas = []
+    if ids_aquisicao:
+        aquisicoes_seleccionadas = Aquisicao.query.filter(
+            Aquisicao.id_aquisicao.in_(ids_aquisicao)
+        ).all()
+
+    if request.method == 'POST' and 'confirmar' in request.form:
+        id_utilizador = request.form.get('id_utilizador')
+        ids_finais = request.form.getlist('ids_aquisicao')
+        periodo = request.form.get('periodo', '2025')
+
+        if not id_utilizador:
+            flash('Seleccione o auditor responsável.', 'danger')
+            return render_template('auditoria/nova.html',
+                                   utilizadores=utilizadores,
+                                   aquisicoes_seleccionadas=aquisicoes_seleccionadas,
+                                   ids_aquisicao=ids_aquisicao
+                                   )
+
+        if not ids_finais:
+            flash('Nenhuma aquisição seleccionada. Seleciona as aquisições que desejas auditar.', 'warning')
+            return redirect(url_for('aquisicao.index'))
 
         # Cria a sessao de auditoria
         auditoria = Auditoria(
@@ -36,17 +62,25 @@ def nova():
         db.session.add(auditoria)
         db.session.flush()
 
-        # Executa o motor de regras
-        sucesso, mensagem = executar_auditoria(auditoria, periodo)
+        # Executa o motor apenas com as aquisicoes seleccionadas
+        sucesso, mensagem = executar_auditoria(auditoria, ids_finais)
 
         if sucesso:
-            flash(f'Auditoria concluida. {mensagem}', 'success')
+            flash(f'Auditoria concluída com sucesso.', 'success')
             return redirect(url_for('auditoria.detalhe', id=auditoria.id_auditoria))
         else:
             flash(f'Erro na auditoria: {mensagem}', 'danger')
-            return render_template('auditoria/nova.html', utilizadores=utilizadores)
+            return render_template('auditoria/nova.html',
+                                   utilizadores=utilizadores,
+                                   aquisicoes_seleccionadas=aquisicoes_seleccionadas,
+                                   ids_aquisicao=ids_aquisicao
+                                   )
 
-    return render_template('auditoria/nova.html', utilizadores=utilizadores)
+    return render_template('auditoria/nova.html',
+                           utilizadores=utilizadores,
+                           aquisicoes_seleccionadas=aquisicoes_seleccionadas,
+                           ids_aquisicao=ids_aquisicao
+                           )
 
 
 @auditoria_bp.route('/<int:id>')
