@@ -45,7 +45,7 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link {% if 'nao_conformidade' in request.endpoint %}active{% endif %}"
-                   href="#">
+                   href="{{ url_for('nao_conformidade.index') }}">
                     <i class="bi bi-exclamation-triangle"></i>
                     <span>Não Conformidades</span>
                 </a>

@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+
+{% block title %}Não Conformidades{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-exclamation-triangle"></i> Não Conformidades</h2>
+    <span class="badge bg-danger fs-6">{{ nao_conformidades|length }} registadas</span>
+</div>
+
+<!-- FILTROS -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Gravidade</label>
+                <select class="form-select" name="gravidade">
+                    <option value="">Todas</option>
+                    <option value="critica" {% if filtro_gravidade == 'critica' %}selected{% endif %}>Crítica</option>
+                    <option value="alta" {% if filtro_gravidade == 'alta' %}selected{% endif %}>Alta</option>
+                    <option value="media" {% if filtro_gravidade == 'media' %}selected{% endif %}>Média</option>
+                    <option value="baixa" {% if filtro_gravidade == 'baixa' %}selected{% endif %}>Baixa</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Status</label>
+                <select class="form-select" name="status">
+                    <option value="">Todos</option>
+                    <option value="aberta" {% if filtro_status == 'aberta' %}selected{% endif %}>Aberta</option>
+                    <option value="em_analise" {% if filtro_status == 'em_analise' %}selected{% endif %}>Em análise</option>
+                    <option value="resolvida" {% if filtro_status == 'resolvida' %}selected{% endif %}>Resolvida</option>
+                    <option value="ignorada" {% if filtro_status == 'ignorada' %}selected{% endif %}>Ignorada</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Regra</label>
+                <select class="form-select" name="id_regra">
+                    <option value="">Todas</option>
+                    {% for r in regras %}
+                        <option value="{{ r.id_regra }}"
+                            {% if filtro_regra == r.id_regra|string %}selected{% endif %}>
+                            {{ r.codigo }} — {{ r.nome }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-funnel"></i> Filtrar
+                </button>
+                <a href="{{ url_for('nao_conformidade.index') }}" class="btn btn-outline-secondary w-100">
+                    Limpar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- LISTAGEM -->
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Regra</th>
+                    <th>Aquisição</th>
+                    <th>Descrição</th>
+                    <th>Gravidade</th>
+                    <th>Data</th>
+                    <th>Status</th>
+                    <th>Acções</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for nc in nao_conformidades %}
+                <tr>
+                    <td>{{ nc.id_nao_conformidade }}</td>
+                    <td>
+                        <span class="badge bg-secondary">{{ nc.regra.codigo }}</span>
+                    </td>
+                    <td>#{{ nc.auditoria_aquisicao.aquisicao.id_aquisicao }}</td>
+                    <td>
+                        <small>
+                            {{ nc.descricao[:80] }}
+                            {% if nc.descricao|length > 80 %}...{% endif %}
+                        </small>
+                        {% if nc.comentario_auditor %}
+                            <br>
+                            <small class="text-muted">
+                                <i class="bi bi-chat-left-text"></i>
+                                {{ nc.comentario_auditor }}
+                            </small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge badge-{{ nc.gravidade }}">
+                            {{ nc.gravidade }}
+                        </span>
+                    </td>
+                    <td>
+                        <small>{{ nc.data_registo.strftime('%d/%m/%Y') }}</small>
+                    </td>
+                    <td>
+                        {% if nc.status == 'aberta' %}
+                            <span class="badge bg-danger">Aberta</span>
+                        {% elif nc.status == 'em_analise' %}
+                            <span class="badge bg-warning text-dark">Em análise</span>
+                        {% elif nc.status == 'resolvida' %}
+                            <span class="badge bg-success">Resolvida</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Ignorada</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modal-{{ nc.id_nao_conformidade }}">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                    </td>
+                </tr>
+
+                <!-- MODAL DE ACTUALIZACAO -->
+                <div class="modal fade" id="modal-{{ nc.id_nao_conformidade }}" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">
+                                    Não Conformidade #{{ nc.id_nao_conformidade }}
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <form method="POST"
+                                  action="{{ url_for('nao_conformidade.actualizar', id=nc.id_nao_conformidade) }}">
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Irregularidade detectada</label>
+                                        <p class="text-muted small border rounded p-2 bg-light">
+                                            {{ nc.descricao }}
+                                        </p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Regra violada</label>
+                                        <p>
+                                            <span class="badge bg-secondary">{{ nc.regra.codigo }}</span>
+                                            {{ nc.regra.nome }}
+                                        </p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Actualizar Status</label>
+                                        <select class="form-select" name="status">
+                                            <option value="aberta" {% if nc.status == 'aberta' %}selected{% endif %}>Aberta</option>
+                                            <option value="em_analise" {% if nc.status == 'em_analise' %}selected{% endif %}>Em análise</option>
+                                            <option value="resolvida" {% if nc.status == 'resolvida' %}selected{% endif %}>Resolvida</option>
+                                            <option value="ignorada" {% if nc.status == 'ignorada' %}selected{% endif %}>Ignorada</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Comentário do Auditor</label>
+                                        <textarea class="form-control"
+                                                  name="comentario_auditor"
+                                                  rows="3"
+                                                  placeholder="Observações, justificativas ou evidências adicionais...">{{ nc.comentario_auditor or '' }}</textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                        Cancelar
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-check-lg"></i> Guardar
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                {% endfor %}
+
+                {% if not nao_conformidades %}
+                <tr>
+                    <td colspan="8" class="text-center text-muted py-5">
+                        <i class="bi bi-check-circle text-success fs-2"></i>
+                        <p class="mt-2 mb-0">Nenhuma não conformidade encontrada.</p>
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
