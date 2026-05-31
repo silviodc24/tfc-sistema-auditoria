@@ -1,16 +1,141 @@
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Auditoria de Conformidade — NS Aplicação</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container mt-5">
-        <h1>Sistema de Auditoria de Conformidade</h1>
-        <p class="text-muted">NS Aplicação — Sistema em desenvolvimento</p>
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="bi bi-speedometer2"></i> Dashboard</h2>
+        <p class="text-muted">Visão geral do sistema de auditoria de conformidade — NS Aplicação</p>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+</div>
+
+<!-- CARDS DE RESUMO -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            <div class="fs-1 text-primary fw-bold">{{ total_auditorias }}</div>
+            <small class="text-muted"><i class="bi bi-clipboard-check"></i> Auditorias Realizadas</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            <div class="fs-1 text-success fw-bold">{{ total_conformes }}</div>
+            <small class="text-muted"><i class="bi bi-check-circle"></i> Aquisições Conformes</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            <div class="fs-1 text-danger fw-bold">{{ total_nao_conformes }}</div>
+            <small class="text-muted"><i class="bi bi-exclamation-triangle"></i> Não Conformidades</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            <div class="fs-1 text-warning fw-bold">{{ total_criticas }}</div>
+            <small class="text-muted"><i class="bi bi-exclamation-octagon"></i> Gravidade Crítica</small>
+        </div>
+    </div>
+</div>
+
+<!-- ULTIMAS AUDITORIAS -->
+<div class="row">
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="bi bi-clock-history"></i> Últimas Auditorias</h6>
+                <a href="{{ url_for('auditoria.index') }}" class="btn btn-sm btn-outline-primary">Ver todas</a>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Período</th>
+                            <th>Data</th>
+                            <th>Não Conformes</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in ultimas_auditorias %}
+                        <tr>
+                            <td>{{ a.id_auditoria }}</td>
+                            <td>{{ a.periodo_analisado }}</td>
+                            <td>{{ a.data_execucao.strftime('%d/%m/%Y') }}</td>
+                            <td>
+                                {% if a.total_nao_conformidades > 0 %}
+                                    <span class="badge bg-danger">{{ a.total_nao_conformidades }}</span>
+                                {% else %}
+                                    <span class="badge bg-success">0</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if a.status == 'concluida' %}
+                                    <span class="badge bg-success">Concluída</span>
+                                {% elif a.status == 'em_curso' %}
+                                    <span class="badge bg-warning text-dark">Em curso</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Erro</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% if not ultimas_auditorias %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-3">Nenhuma auditoria realizada ainda.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- NAO CONFORMIDADES RECENTES -->
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Não Conformidades Recentes</h6>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Regra</th>
+                            <th>Gravidade</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for nc in ultimas_nao_conformidades %}
+                        <tr>
+                            <td>{{ nc.regra.codigo }}</td>
+                            <td>
+                                <span class="badge badge-{{ nc.gravidade }}">{{ nc.gravidade }}</span>
+                            </td>
+                            <td>
+                                {% if nc.status == 'aberta' %}
+                                    <span class="badge bg-danger">Aberta</span>
+                                {% elif nc.status == 'em_analise' %}
+                                    <span class="badge bg-warning text-dark">Em análise</span>
+                                {% elif nc.status == 'resolvida' %}
+                                    <span class="badge bg-success">Resolvida</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Ignorada</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% if not ultimas_nao_conformidades %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted py-3">Nenhuma não conformidade registada.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
