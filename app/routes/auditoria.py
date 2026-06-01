@@ -4,6 +4,8 @@ from app.models.auditoria import Auditoria
 from app.models.aquisicao import Aquisicao
 from app.models.utilizador import Utilizador
 from app.services.motor_auditoria import executar_auditoria
+from flask import send_file
+from app.services.exportacao import gerar_pdf, gerar_excel
 
 auditoria_bp = Blueprint('auditoria', __name__, url_prefix='/auditoria')
 
@@ -81,6 +83,35 @@ def nova():
                            aquisicoes_seleccionadas=aquisicoes_seleccionadas,
                            ids_aquisicao=ids_aquisicao
                            )
+
+
+
+@auditoria_bp.route('/<int:id>/exportar/pdf')
+def exportar_pdf(id):
+    """Exporta o relatorio de auditoria em PDF."""
+    auditoria = Auditoria.query.get_or_404(id)
+    buffer = gerar_pdf(auditoria)
+    nome_ficheiro = f"auditoria_{auditoria.id_auditoria}_{auditoria.periodo_analisado}.pdf"
+    return send_file(
+        buffer,
+        mimetype='application/pdf',
+        as_attachment=True,
+        download_name=nome_ficheiro
+    )
+
+
+@auditoria_bp.route('/<int:id>/exportar/excel')
+def exportar_excel(id):
+    """Exporta o relatorio de auditoria em Excel."""
+    auditoria = Auditoria.query.get_or_404(id)
+    buffer = gerar_excel(auditoria)
+    nome_ficheiro = f"auditoria_{auditoria.id_auditoria}_{auditoria.periodo_analisado}.xlsx"
+    return send_file(
+        buffer,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        as_attachment=True,
+        download_name=nome_ficheiro
+    )
 
 
 @auditoria_bp.route('/<int:id>')
