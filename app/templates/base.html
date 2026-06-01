@@ -52,7 +52,7 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link {% if 'configuracao' in request.endpoint %}active{% endif %}"
-                   href="#">
+                   href="{{ url_for('configuracao.index') }}">
                     <i class="bi bi-gear"></i>
                     <span>Configuração</span>
                 </a>

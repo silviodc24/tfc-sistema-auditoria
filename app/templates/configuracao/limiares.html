@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Limiares de Autorização{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-sliders"></i> Limiares de Autorização</h2>
+    <a href="{{ url_for('configuracao.index') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Voltar
+    </a>
+</div>
+
+<div class="alert alert-info">
+    <i class="bi bi-info-circle"></i>
+    Os limiares definem o nível hierárquico mínimo exigido para aprovar aquisições
+    consoante o valor. Alterações aqui afectam imediatamente as próximas auditorias.
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Valor Mínimo (Kz)</th>
+                    <th>Valor Máximo (Kz)</th>
+                    <th>Nível Mínimo Exigido</th>
+                    <th>Descrição do Nível</th>
+                    <th>Acções</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for l in limiares %}
+                <tr>
+                    <td>{{ "{:,.2f}".format(l.valor_minimo) }}</td>
+                    <td>
+                        {% if l.valor_maximo %}
+                            {{ "{:,.2f}".format(l.valor_maximo) }}
+                        {% else %}
+                            <span class="text-muted">Sem limite</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge bg-primary">Nível {{ l.nivel_minimo }}</span>
+                    </td>
+                    <td>
+                        {% if l.nivel_minimo == 1 %}Técnico
+                        {% elif l.nivel_minimo == 2 %}Supervisor
+                        {% elif l.nivel_minimo == 3 %}Chefe de Departamento
+                        {% elif l.nivel_minimo == 4 %}Subdirector
+                        {% elif l.nivel_minimo == 5 %}Director
+                        {% elif l.nivel_minimo == 6 %}Administrador
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('configuracao.editar_limiar', id=l.id_limiar) }}"
+                           class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

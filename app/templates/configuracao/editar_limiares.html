@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Limiar{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-pencil"></i> Editar Limiar</h2>
+    <a href="{{ url_for('configuracao.limiares') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Voltar
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Valor Mínimo (Kz)</label>
+                        <input type="number"
+                               class="form-control"
+                               name="valor_minimo"
+                               step="0.01"
+                               value="{{ limiar.valor_minimo }}"
+                               required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Valor Máximo (Kz)</label>
+                        <input type="number"
+                               class="form-control"
+                               name="valor_maximo"
+                               step="0.01"
+                               value="{{ limiar.valor_maximo or '' }}"
+                               placeholder="Deixe vazio para sem limite superior">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nível Mínimo Exigido</label>
+                        <select class="form-select" name="nivel_minimo" required>
+                            <option value="1" {% if limiar.nivel_minimo == 1 %}selected{% endif %}>1 — Técnico</option>
+                            <option value="2" {% if limiar.nivel_minimo == 2 %}selected{% endif %}>2 — Supervisor</option>
+                            <option value="3" {% if limiar.nivel_minimo == 3 %}selected{% endif %}>3 — Chefe de Departamento</option>
+                            <option value="4" {% if limiar.nivel_minimo == 4 %}selected{% endif %}>4 — Subdirector</option>
+                            <option value="5" {% if limiar.nivel_minimo == 5 %}selected{% endif %}>5 — Director</option>
+                            <option value="6" {% if limiar.nivel_minimo == 6 %}selected{% endif %}>6 — Administrador</option>
+                        </select>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg"></i> Guardar
+                        </button>
+                        <a href="{{ url_for('configuracao.limiares') }}" class="btn btn-outline-secondary">
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

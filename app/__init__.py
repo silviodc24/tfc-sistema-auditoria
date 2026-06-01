@@ -28,6 +28,9 @@ def create_app():
     from app.routes.nao_conformidade import nc_bp
     app.register_blueprint(nc_bp)
 
+    from app.routes.configuracao import config_bp
+    app.register_blueprint(config_bp)
+
     from app import models
 
     return app
