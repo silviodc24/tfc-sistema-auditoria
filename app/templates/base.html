@@ -21,6 +21,19 @@
             </span>
         </div>
 
+         {% if current_user.is_authenticated %}
+         <div class="px-3 py-2 border-bottom border-white border-opacity-25">
+                <small class="text-white-50">
+                    <i class="bi bi-person-circle"></i>
+                        {{ current_user.nome }}
+                </small>
+                <br>
+                <small class="text-white-50" style="font-size: 0.75rem;">
+                        {{ current_user.perfil.title() }}
+                </small>
+            </div>
+        {% endif %}
+
         <ul class="nav flex-column mt-4">
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'main.index' %}active{% endif %}"
@@ -55,6 +68,14 @@
                    href="{{ url_for('configuracao.index') }}">
                     <i class="bi bi-gear"></i>
                     <span>Configuração</span>
+                </a>
+            </li>
+            
+            <li class="nav-item mt-auto">
+                <a class="nav-link text-white-50"
+                    href="{{ url_for('auth.logout') }}">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Terminar Sessão</span>
                 </a>
             </li>
         </ul>

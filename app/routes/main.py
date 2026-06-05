@@ -2,11 +2,13 @@ from flask import Blueprint, render_template
 from app.models.auditoria import Auditoria
 from app.models.auditoria_aquisicao import AuditoriaAquisicao
 from app.models.nao_conformidade import NaoConformidade
+from flask_login import login_required
 
 main = Blueprint('main', __name__)
 
 
 @main.route('/')
+@login_required
 def index():
     total_auditorias = Auditoria.query.count()
     total_conformes = AuditoriaAquisicao.query.filter_by(

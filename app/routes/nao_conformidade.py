@@ -2,11 +2,13 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from app import db
 from app.models.nao_conformidade import NaoConformidade
 from app.models.regra_auditoria import RegraAuditoria
+from flask_login import login_required
 
 nc_bp = Blueprint('nao_conformidade', __name__, url_prefix='/nao-conformidades')
 
 
 @nc_bp.route('/')
+@login_required
 def index():
     """Lista todas as nao conformidades com filtros opcionais."""
     gravidade = request.args.get('gravidade', '')
@@ -38,6 +40,7 @@ def index():
 
 
 @nc_bp.route('/<int:id>/actualizar', methods=['POST'])
+@login_required
 def actualizar(id):
     """Actualiza o status e comentario de uma nao conformidade."""
     nc = NaoConformidade.query.get_or_404(id)

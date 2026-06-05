@@ -6,23 +6,27 @@ from app.models.utilizador import Utilizador
 from app.services.motor_auditoria import executar_auditoria
 from flask import send_file
 from app.services.exportacao import gerar_pdf, gerar_excel
+from flask_login import login_required, current_user
 
 auditoria_bp = Blueprint('auditoria', __name__, url_prefix='/auditoria')
 
 
 @auditoria_bp.route('/')
+@login_required
 def index():
     """Lista todas as sessoes de auditoria."""
     auditorias = Auditoria.query.order_by(Auditoria.data_execucao.desc()).all()
     return render_template('auditoria/index.html', auditorias=auditorias)
 
 @auditoria_bp.route('/iniciar')
+@login_required
 def iniciar():
     """Redireciona para aquisicoes com mensagem a pedir seleccao."""
     flash('Seleccione as aquisições que pretende auditar.', 'info')
     return redirect(url_for('aquisicao.index'))
 
 @auditoria_bp.route('/nova', methods=['GET', 'POST'])
+@login_required
 def nova():
     """Confirmacao e execucao de uma nova sessao de auditoria."""
     utilizadores = Utilizador.query.filter_by(ativo=True).all()
@@ -87,6 +91,7 @@ def nova():
 
 
 @auditoria_bp.route('/<int:id>/exportar/pdf')
+@login_required
 def exportar_pdf(id):
     """Exporta o relatorio de auditoria em PDF."""
     auditoria = Auditoria.query.get_or_404(id)
@@ -101,6 +106,7 @@ def exportar_pdf(id):
 
 
 @auditoria_bp.route('/<int:id>/exportar/excel')
+@login_required
 def exportar_excel(id):
     """Exporta o relatorio de auditoria em Excel."""
     auditoria = Auditoria.query.get_or_404(id)
@@ -115,6 +121,7 @@ def exportar_excel(id):
 
 
 @auditoria_bp.route('/<int:id>')
+@login_required
 def detalhe(id):
     """Mostra o detalhe de uma sessao de auditoria."""
     auditoria = Auditoria.query.get_or_404(id)

@@ -2,11 +2,13 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from app import db
 from app.models.regra_auditoria import RegraAuditoria
 from app.models.limiar_autorizacao import LimiarAutorizacao
+from flask_login import login_required, current_user
 
 config_bp = Blueprint('configuracao', __name__, url_prefix='/configuracao')
 
 
 @config_bp.route('/')
+@login_required
 def index():
     """Lista todas as regras de auditoria."""
     regras = RegraAuditoria.query.order_by(RegraAuditoria.codigo).all()
@@ -14,6 +16,7 @@ def index():
 
 
 @config_bp.route('/regras/<int:id>/toggle', methods=['POST'])
+@login_required
 def toggle_regra(id):
     """Activa ou desactiva uma regra de auditoria."""
     regra = RegraAuditoria.query.get_or_404(id)
@@ -25,6 +28,7 @@ def toggle_regra(id):
 
 
 @config_bp.route('/regras/<int:id>/editar', methods=['GET', 'POST'])
+@login_required
 def editar_regra(id):
     """Edita o valor_referencia de uma regra de auditoria."""
     regra = RegraAuditoria.query.get_or_404(id)
@@ -40,6 +44,7 @@ def editar_regra(id):
 
 
 @config_bp.route('/limiares')
+@login_required
 def limiares():
     """Lista os limiares de autorizacao."""
     limiares = LimiarAutorizacao.query.order_by(
@@ -49,6 +54,7 @@ def limiares():
 
 
 @config_bp.route('/limiares/<int:id>/editar', methods=['GET', 'POST'])
+@login_required
 def editar_limiar(id):
     """Edita um limiar de autorizacao."""
     limiar = LimiarAutorizacao.query.get_or_404(id)

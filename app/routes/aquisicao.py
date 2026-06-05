@@ -2,11 +2,13 @@ from flask import Blueprint, render_template, request
 from app.models.aquisicao import Aquisicao
 from app.models.centro_custo import CentroCusto
 from app.models.orcamento import Orcamento
+from flask_login import login_required
 
 aquisicao_bp = Blueprint('aquisicao', __name__, url_prefix='/aquisicoes')
 
 
 @aquisicao_bp.route('/')
+@login_required
 def index():
     """Lista todas as aquisicoes com filtros opcionais."""
     id_centro = request.args.get('id_centro', '')
