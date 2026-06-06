@@ -13,40 +13,139 @@
             <li class="breadcrumb-item active">Importação</li>
         </ol>
     </nav>
+    <div class="alert alert-info mt-3">
+        <i class="bi bi-info-circle"></i>
+        Importe os ficheiros CSV pela ordem indicada — cada entidade depende
+        das anteriores. Formatos aceites: <strong>CSV (UTF-8)</strong>.
+    </div>
 </div>
 
 <div class="row g-4">
-    <div class="col-md-3">
-        <div class="card h-100 text-center p-3">
-            <i class="bi bi-people fs-1 text-primary mb-3"></i>
-            <h6>Colaboradores</h6>
-            <p class="text-muted small">Importar colaboradores e níveis hierárquicos</p>
-            <span class="badge bg-warning text-dark">Em desenvolvimento</span>
+
+    <!-- COLABORADORES -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header d-flex align-items-center gap-2">
+                <span class="badge bg-primary rounded-circle p-2">1</span>
+                <h6 class="mb-0"><i class="bi bi-people"></i> Colaboradores</h6>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small">
+                    Importe primeiro os colaboradores — são referenciados por
+                    todas as outras entidades. Campos obrigatórios:
+                    <code>nome, email, nivel_hierarquico, ativo</code>
+                </p>
+                <form method="POST"
+                      action="{{ url_for('configuracao.importar_colaboradores_route') }}"
+                      enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <input type="file"
+                               class="form-control"
+                               name="ficheiro"
+                               accept=".csv"
+                               required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-upload"></i> Importar Colaboradores
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card h-100 text-center p-3">
-            <i class="bi bi-diagram-3 fs-1 text-success mb-3"></i>
-            <h6>Centros de Custo</h6>
-            <p class="text-muted small">Importar centros de custo e departamentos</p>
-            <span class="badge bg-warning text-dark">Em desenvolvimento</span>
+
+    <!-- CENTROS DE CUSTO -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header d-flex align-items-center gap-2">
+                <span class="badge bg-success rounded-circle p-2">2</span>
+                <h6 class="mb-0"><i class="bi bi-diagram-3"></i> Centros de Custo</h6>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small">
+                    Importe após os colaboradores. O responsável de cada centro
+                    deve existir na base de dados. Campos obrigatórios:
+                    <code>nome, departamento, responsavel_id, ativo</code>
+                </p>
+                <form method="POST"
+                      action="{{ url_for('configuracao.importar_centros_route') }}"
+                      enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <input type="file"
+                               class="form-control"
+                               name="ficheiro"
+                               accept=".csv"
+                               required>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="bi bi-upload"></i> Importar Centros de Custo
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card h-100 text-center p-3">
-            <i class="bi bi-wallet2 fs-1 text-warning mb-3"></i>
-            <h6>Orçamentos</h6>
-            <p class="text-muted small">Importar orçamentos por centro de custo</p>
-            <span class="badge bg-warning text-dark">Em desenvolvimento</span>
+
+    <!-- ORCAMENTOS -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header d-flex align-items-center gap-2">
+                <span class="badge bg-warning rounded-circle p-2 text-dark">3</span>
+                <h6 class="mb-0"><i class="bi bi-wallet2"></i> Orçamentos</h6>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small">
+                    Importe após os centros de custo. Cada orçamento é associado
+                    a um centro e período. Campos obrigatórios:
+                    <code>id_centro, periodo, valor_orcado, valor_executado</code>
+                </p>
+                <form method="POST"
+                      action="{{ url_for('configuracao.importar_orcamentos_route') }}"
+                      enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <input type="file"
+                               class="form-control"
+                               name="ficheiro"
+                               accept=".csv"
+                               required>
+                    </div>
+                    <button type="submit" class="btn btn-warning w-100">
+                        <i class="bi bi-upload"></i> Importar Orçamentos
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card h-100 text-center p-3">
-            <i class="bi bi-bag-check fs-1 text-danger mb-3"></i>
-            <h6>Aquisições</h6>
-            <p class="text-muted small">Importar processos de aquisição para auditoria</p>
-            <span class="badge bg-warning text-dark">Em desenvolvimento</span>
+
+    <!-- AQUISICOES -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header d-flex align-items-center gap-2">
+                <span class="badge bg-danger rounded-circle p-2">4</span>
+                <h6 class="mb-0"><i class="bi bi-bag-check"></i> Aquisições</h6>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small">
+                    Importe por último. Todas as referências devem existir.
+                    Campos obrigatórios:
+                    <code>id_centro, id_orcamento, id_solicitante, id_aprovador,
+                    data_solicitacao, valor, descricao, tipo_aquisicao</code>
+                </p>
+                <form method="POST"
+                      action="{{ url_for('configuracao.importar_aquisicoes_route') }}"
+                      enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <input type="file"
+                               class="form-control"
+                               name="ficheiro"
+                               accept=".csv"
+                               required>
+                    </div>
+                    <button type="submit" class="btn btn-danger w-100">
+                        <i class="bi bi-upload"></i> Importar Aquisições
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
+
 </div>
 {% endblock %}

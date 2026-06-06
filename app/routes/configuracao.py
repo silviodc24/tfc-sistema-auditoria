@@ -4,6 +4,13 @@ from app import db
 from app.models.regra_auditoria import RegraAuditoria
 from app.models.limiar_autorizacao import LimiarAutorizacao
 from app.models.utilizador import Utilizador
+from flask import send_file
+from app.services.importacao import (
+    importar_colaboradores,
+    importar_centros_custo,
+    importar_orcamentos,
+    importar_aquisicoes
+)
 
 config_bp = Blueprint('configuracao', __name__, url_prefix='/configuracao')
 
@@ -157,3 +164,102 @@ def toggle_utilizador(id):
 def importacao():
     """Hub de importacao de dados."""
     return render_template('configuracao/importacao.html')
+
+# =============================================================================
+# ROTAS DE IMPORTACAO
+# =============================================================================
+
+@config_bp.route('/importacao/colaboradores', methods=['POST'])
+@login_required
+def importar_colaboradores_route():
+    ficheiro = request.files.get('ficheiro')
+    if not ficheiro or ficheiro.filename == '':
+        flash('Nenhum ficheiro seleccionado.', 'danger')
+        return redirect(url_for('configuracao.importacao'))
+
+    sucesso, mensagem, total, erros = importar_colaboradores(ficheiro)
+
+    if sucesso:
+        flash(mensagem, 'success')
+    else:
+        flash(mensagem, 'danger')
+
+    if erros:
+        for erro in erros[:5]:
+            flash(erro, 'warning')
+        if len(erros) > 5:
+            flash(f'... e mais {len(erros) - 5} erro(s).', 'warning')
+
+    return redirect(url_for('configuracao.importacao'))
+
+
+@config_bp.route('/importacao/centros-custo', methods=['POST'])
+@login_required
+def importar_centros_route():
+    ficheiro = request.files.get('ficheiro')
+    if not ficheiro or ficheiro.filename == '':
+        flash('Nenhum ficheiro seleccionado.', 'danger')
+        return redirect(url_for('configuracao.importacao'))
+
+    sucesso, mensagem, total, erros = importar_centros_custo(ficheiro)
+
+    if sucesso:
+        flash(mensagem, 'success')
+    else:
+        flash(mensagem, 'danger')
+
+    if erros:
+        for erro in erros[:5]:
+            flash(erro, 'warning')
+        if len(erros) > 5:
+            flash(f'... e mais {len(erros) - 5} erro(s).', 'warning')
+
+    return redirect(url_for('configuracao.importacao'))
+
+
+@config_bp.route('/importacao/orcamentos', methods=['POST'])
+@login_required
+def importar_orcamentos_route():
+    ficheiro = request.files.get('ficheiro')
+    if not ficheiro or ficheiro.filename == '':
+        flash('Nenhum ficheiro seleccionado.', 'danger')
+        return redirect(url_for('configuracao.importacao'))
+
+    sucesso, mensagem, total, erros = importar_orcamentos(ficheiro)
+
+    if sucesso:
+        flash(mensagem, 'success')
+    else:
+        flash(mensagem, 'danger')
+
+    if erros:
+        for erro in erros[:5]:
+            flash(erro, 'warning')
+        if len(erros) > 5:
+            flash(f'... e mais {len(erros) - 5} erro(s).', 'warning')
+
+    return redirect(url_for('configuracao.importacao'))
+
+
+@config_bp.route('/importacao/aquisicoes', methods=['POST'])
+@login_required
+def importar_aquisicoes_route():
+    ficheiro = request.files.get('ficheiro')
+    if not ficheiro or ficheiro.filename == '':
+        flash('Nenhum ficheiro seleccionado.', 'danger')
+        return redirect(url_for('configuracao.importacao'))
+
+    sucesso, mensagem, total, erros = importar_aquisicoes(ficheiro)
+
+    if sucesso:
+        flash(mensagem, 'success')
+    else:
+        flash(mensagem, 'danger')
+
+    if erros:
+        for erro in erros[:5]:
+            flash(erro, 'warning')
+        if len(erros) > 5:
+            flash(f'... e mais {len(erros) - 5} erro(s).', 'warning')
+
+    return redirect(url_for('configuracao.importacao'))
