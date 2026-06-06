@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Importação de Dados{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h2><i class="bi bi-cloud-upload"></i> Importação de Dados</h2>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('configuracao.index') }}">Configuração</a>
+            </li>
+            <li class="breadcrumb-item active">Importação</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-3">
+        <div class="card h-100 text-center p-3">
+            <i class="bi bi-people fs-1 text-primary mb-3"></i>
+            <h6>Colaboradores</h6>
+            <p class="text-muted small">Importar colaboradores e níveis hierárquicos</p>
+            <span class="badge bg-warning text-dark">Em desenvolvimento</span>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center p-3">
+            <i class="bi bi-diagram-3 fs-1 text-success mb-3"></i>
+            <h6>Centros de Custo</h6>
+            <p class="text-muted small">Importar centros de custo e departamentos</p>
+            <span class="badge bg-warning text-dark">Em desenvolvimento</span>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center p-3">
+            <i class="bi bi-wallet2 fs-1 text-warning mb-3"></i>
+            <h6>Orçamentos</h6>
+            <p class="text-muted small">Importar orçamentos por centro de custo</p>
+            <span class="badge bg-warning text-dark">Em desenvolvimento</span>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center p-3">
+            <i class="bi bi-bag-check fs-1 text-danger mb-3"></i>
+            <h6>Aquisições</h6>
+            <p class="text-muted small">Importar processos de aquisição para auditoria</p>
+            <span class="badge bg-warning text-dark">Em desenvolvimento</span>
+        </div>
+    </div>
+</div>
+{% endblock %}

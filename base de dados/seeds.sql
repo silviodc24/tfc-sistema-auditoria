@@ -9,9 +9,9 @@ USE sistema_auditoria;
 -- =============================================================================
 -- UTILIZADORES INICIAIS
 -- =============================================================================
-INSERT INTO utilizador (nome, email, perfil, ativo) VALUES
-('Administrador do Sistema', 'admin@ns-aplicacao.ao',    'administrador', TRUE),
-('Auditor Chefe',            'auditor@ns-aplicacao.ao',  'auditor',        TRUE);
+INSERT INTO utilizador (nome, email, password_hash, perfil, ativo) VALUES
+('Administrador do Sistema', 'admin@ns-aplicacao.ao', 'scrypt:32768:8:1$PLLgkShWo4EFH4X2$a0ec7bc4b3c0213ab2e935bf3b0e9374ab5775d0c0f56582d98c2eab8e8bfc84c5266fa999755c06053cb750e8e527fce92c9783ac23bd585113bcbf72e33889', 'administrador', TRUE),
+('Auditor Chefe', 'auditor@ns-aplicacao.ao', 'scrypt:32768:8:1$PLLgkShWo4EFH4X2$a0ec7bc4b3c0213ab2e935bf3b0e9374ab5775d0c0f56582d98c2eab8e8bfc84c5266fa999755c06053cb750e8e527fce92c9783ac23bd585113bcbf72e33889', 'auditor', TRUE);
 
 
 
