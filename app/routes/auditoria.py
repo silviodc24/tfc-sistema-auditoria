@@ -2,7 +2,6 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from app import db
 from app.models.auditoria import Auditoria
 from app.models.aquisicao import Aquisicao
-from app.models.utilizador import Utilizador
 from app.services.motor_auditoria import executar_auditoria
 from flask import send_file
 from app.services.exportacao import gerar_pdf, gerar_excel
@@ -28,9 +27,6 @@ def iniciar():
 @auditoria_bp.route('/nova', methods=['GET', 'POST'])
 @login_required
 def nova():
-    """Confirmacao e execucao de uma nova sessao de auditoria."""
-    utilizadores = Utilizador.query.filter_by(ativo=True).all()
-
     # Recebe os IDs seleccionados na pagina de aquisicoes
     ids_aquisicao = request.form.getlist(
         'ids_aquisicao') or request.args.getlist('ids_aquisicao')
@@ -43,17 +39,10 @@ def nova():
         ).all()
 
     if request.method == 'POST' and 'confirmar' in request.form:
-        id_utilizador = request.form.get('id_utilizador')
+        id_utilizador = current_user.id_utilizador
         ids_finais = request.form.getlist('ids_aquisicao')
         periodo = request.form.get('periodo', '2025')
 
-        if not id_utilizador:
-            flash('Seleccione o auditor responsável.', 'danger')
-            return render_template('auditoria/nova.html',
-                                   utilizadores=utilizadores,
-                                   aquisicoes_seleccionadas=aquisicoes_seleccionadas,
-                                   ids_aquisicao=ids_aquisicao
-                                   )
 
         if not ids_finais:
             flash('Nenhuma aquisição seleccionada. Seleciona as aquisições que desejas auditar.', 'warning')
@@ -61,7 +50,7 @@ def nova():
 
         # Cria a sessao de auditoria
         auditoria = Auditoria(
-            id_utilizador=id_utilizador,
+            id_utilizador=current_user.id_utilizador,
             periodo_analisado=periodo,
             status='em_curso'
         )
@@ -77,13 +66,11 @@ def nova():
         else:
             flash(f'Erro na auditoria: {mensagem}', 'danger')
             return render_template('auditoria/nova.html',
-                                   utilizadores=utilizadores,
                                    aquisicoes_seleccionadas=aquisicoes_seleccionadas,
                                    ids_aquisicao=ids_aquisicao
                                    )
 
     return render_template('auditoria/nova.html',
-                           utilizadores=utilizadores,
                            aquisicoes_seleccionadas=aquisicoes_seleccionadas,
                            ids_aquisicao=ids_aquisicao
                            )

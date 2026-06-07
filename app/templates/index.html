@@ -6,45 +6,93 @@
 <div class="row mb-4">
     <div class="col-12">
         <h2><i class="bi bi-speedometer2"></i> Dashboard</h2>
-        <p class="text-muted">Visão geral do sistema de auditoria de conformidade — NS Aplicação</p>
+        <p class="text-muted">
+            Bem-vindo, <strong>{{ current_user.nome }}</strong>.
+            Visão geral do sistema de auditoria de conformidade.
+        </p>
     </div>
 </div>
 
 <!-- CARDS DE RESUMO -->
-<div class="row mb-4">
+<div class="row mb-4 g-3">
     <div class="col-md-3">
         <div class="card text-center p-3">
             <div class="fs-1 text-primary fw-bold">{{ total_auditorias }}</div>
-            <small class="text-muted"><i class="bi bi-clipboard-check"></i> Auditorias Realizadas</small>
+            <small class="text-muted">
+                <i class="bi bi-clipboard-check"></i> Auditorias Realizadas
+            </small>
         </div>
     </div>
     <div class="col-md-3">
         <div class="card text-center p-3">
             <div class="fs-1 text-success fw-bold">{{ total_conformes }}</div>
-            <small class="text-muted"><i class="bi bi-check-circle"></i> Aquisições Conformes</small>
+            <small class="text-muted">
+                <i class="bi bi-check-circle"></i> Aquisições Conformes
+            </small>
         </div>
     </div>
     <div class="col-md-3">
         <div class="card text-center p-3">
             <div class="fs-1 text-danger fw-bold">{{ total_nao_conformes }}</div>
-            <small class="text-muted"><i class="bi bi-exclamation-triangle"></i> Não Conformidades</small>
+            <small class="text-muted">
+                <i class="bi bi-exclamation-triangle"></i> Não Conformidades
+            </small>
         </div>
     </div>
     <div class="col-md-3">
         <div class="card text-center p-3">
             <div class="fs-1 text-warning fw-bold">{{ total_criticas }}</div>
-            <small class="text-muted"><i class="bi bi-exclamation-octagon"></i> Gravidade Crítica</small>
+            <small class="text-muted">
+                <i class="bi bi-exclamation-octagon"></i> Gravidade Crítica
+            </small>
         </div>
     </div>
 </div>
 
-<!-- ULTIMAS AUDITORIAS -->
-<div class="row">
+<!-- GRAFICOS -->
+<div class="row mb-4 g-3">
+    <!-- GRAFICO DE BARRAS -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-bar-chart"></i>
+                    Conformes vs Não Conformes por Centro de Custo
+                </h6>
+            </div>
+            <div class="card-body">
+                <canvas id="graficoBarras" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- GRAFICO DE ROSCA -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-pie-chart"></i>
+                    Distribuição por Gravidade
+                </h6>
+            </div>
+            <div class="card-body d-flex justify-content-center">
+                <canvas id="graficoRosca" height="200" width="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TABELAS -->
+<div class="row g-3">
+    <!-- ULTIMAS AUDITORIAS -->
     <div class="col-md-7">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h6 class="mb-0"><i class="bi bi-clock-history"></i> Últimas Auditorias</h6>
-                <a href="{{ url_for('auditoria.index') }}" class="btn btn-sm btn-outline-primary">Ver todas</a>
+                <h6 class="mb-0">
+                    <i class="bi bi-clock-history"></i> Últimas Auditorias
+                </h6>
+                <a href="{{ url_for('auditoria.index') }}"
+                   class="btn btn-sm btn-outline-primary">Ver todas</a>
             </div>
             <div class="card-body p-0">
                 <table class="table table-hover mb-0">
@@ -65,7 +113,9 @@
                             <td>{{ a.data_execucao.strftime('%d/%m/%Y') }}</td>
                             <td>
                                 {% if a.total_nao_conformidades > 0 %}
-                                    <span class="badge bg-danger">{{ a.total_nao_conformidades }}</span>
+                                    <span class="badge bg-danger">
+                                        {{ a.total_nao_conformidades }}
+                                    </span>
                                 {% else %}
                                     <span class="badge bg-success">0</span>
                                 {% endif %}
@@ -83,7 +133,9 @@
                         {% endfor %}
                         {% if not ultimas_auditorias %}
                         <tr>
-                            <td colspan="5" class="text-center text-muted py-3">Nenhuma auditoria realizada ainda.</td>
+                            <td colspan="5" class="text-center text-muted py-3">
+                                Nenhuma auditoria realizada ainda.
+                            </td>
                         </tr>
                         {% endif %}
                     </tbody>
@@ -92,11 +144,16 @@
         </div>
     </div>
 
-    <!-- NAO CONFORMIDADES RECENTES -->
+    <!-- ULTIMAS NAO CONFORMIDADES -->
     <div class="col-md-5">
         <div class="card">
-            <div class="card-header">
-                <h6 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Não Conformidades Recentes</h6>
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    Não Conformidades Recentes
+                </h6>
+                <a href="{{ url_for('nao_conformidade.index') }}"
+                   class="btn btn-sm btn-outline-danger">Ver todas</a>
             </div>
             <div class="card-body p-0">
                 <table class="table table-hover mb-0">
@@ -110,9 +167,15 @@
                     <tbody>
                         {% for nc in ultimas_nao_conformidades %}
                         <tr>
-                            <td>{{ nc.regra.codigo }}</td>
                             <td>
-                                <span class="badge badge-{{ nc.gravidade }}">{{ nc.gravidade }}</span>
+                                <span class="badge bg-secondary">
+                                    {{ nc.regra.codigo }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge badge-{{ nc.gravidade }}">
+                                    {{ nc.gravidade }}
+                                </span>
                             </td>
                             <td>
                                 {% if nc.status == 'aberta' %}
@@ -129,7 +192,9 @@
                         {% endfor %}
                         {% if not ultimas_nao_conformidades %}
                         <tr>
-                            <td colspan="3" class="text-center text-muted py-3">Nenhuma não conformidade registada.</td>
+                            <td colspan="3" class="text-center text-muted py-3">
+                                Nenhuma não conformidade registada.
+                            </td>
                         </tr>
                         {% endif %}
                     </tbody>
@@ -138,4 +203,87 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    // Dados injectados pelo Flask via Jinja2
+    const labelsCentros = {{ labels_centros | tojson }};
+    const dadosConformes = {{ dados_conformes | tojson }};
+    const dadosNaoConformes = {{ dados_nao_conformes | tojson }};
+
+    // GRAFICO DE BARRAS
+    new Chart(document.getElementById('graficoBarras'), {
+        type: 'bar',
+        data: {
+            labels: labelsCentros,
+            datasets: [
+                {
+                    label: 'Conformes',
+                    data: dadosConformes,
+                    backgroundColor: 'rgba(25, 135, 84, 0.7)',
+                    borderColor: 'rgba(25, 135, 84, 1)',
+                    borderWidth: 1,
+                    borderRadius: 4
+                },
+                {
+                    label: 'Não Conformes',
+                    data: dadosNaoConformes,
+                    backgroundColor: 'rgba(220, 53, 69, 0.7)',
+                    borderColor: 'rgba(220, 53, 69, 1)',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            }
+        }
+    });
+
+    // GRAFICO DE ROSCA
+    new Chart(document.getElementById('graficoRosca'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Baixa', 'Média', 'Alta', 'Crítica'],
+            datasets: [{
+                data: [
+                    {{ total_baixa }},
+                    {{ total_media }},
+                    {{ total_alta }},
+                    {{ total_critica }}
+                ],
+                backgroundColor: [
+                    'rgba(25, 135, 84, 0.8)',
+                    'rgba(255, 193, 7, 0.8)',
+                    'rgba(253, 126, 20, 0.8)',
+                    'rgba(220, 53, 69, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(25, 135, 84, 1)',
+                    'rgba(255, 193, 7, 1)',
+                    'rgba(253, 126, 20, 1)',
+                    'rgba(220, 53, 69, 1)'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+</script>
 {% endblock %}
