@@ -133,6 +133,7 @@
                             </div>
                             <form method="POST"
                                   action="{{ url_for('nao_conformidade.actualizar', id=nc.id_nao_conformidade) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <div class="modal-body">
                                     <div class="mb-3">
                                         <label class="form-label fw-bold">Irregularidade detectada</label>

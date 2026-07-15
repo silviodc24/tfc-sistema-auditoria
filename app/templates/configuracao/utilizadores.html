@@ -56,6 +56,7 @@
                     <td>
                         <form method="POST"
                               action="{{ url_for('configuracao.toggle_utilizador', id=u.id_utilizador) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <button type="submit"
                                     class="btn btn-sm {% if u.ativo %}btn-outline-danger{% else %}btn-outline-success{% endif %}"
                                     {% if u.id_utilizador == current_user.id_utilizador %}disabled{% endif %}>

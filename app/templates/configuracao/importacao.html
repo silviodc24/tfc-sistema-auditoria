@@ -38,6 +38,7 @@
                 <form method="POST"
                       action="{{ url_for('configuracao.importar_colaboradores_route') }}"
                       enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
                         <input type="file"
                                class="form-control"
@@ -69,6 +70,7 @@
                 <form method="POST"
                       action="{{ url_for('configuracao.importar_centros_route') }}"
                       enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
                         <input type="file"
                                class="form-control"
@@ -100,6 +102,7 @@
                 <form method="POST"
                       action="{{ url_for('configuracao.importar_orcamentos_route') }}"
                       enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
                         <input type="file"
                                class="form-control"
@@ -132,6 +135,7 @@
                 <form method="POST"
                       action="{{ url_for('configuracao.importar_aquisicoes_route') }}"
                       enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
                         <input type="file"
                                class="form-control"

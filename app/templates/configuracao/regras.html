@@ -65,6 +65,7 @@
                         </a>
                         <form method="POST"
                               action="{{ url_for('configuracao.toggle_regra', id=r.id_regra) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <button type="submit"
                                     class="btn btn-sm {% if r.ativa %}btn-outline-danger{% else %}btn-outline-success{% endif %}">
                                 {% if r.ativa %}

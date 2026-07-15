@@ -1,7 +1,13 @@
-from flask import Flask, current_app
+import secrets
+
+from flask import Flask, current_app, flash, g, redirect, request, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
+from flask_wtf import CSRFProtect
+from flask_wtf.csrf import CSRFError
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -9,6 +15,12 @@ load_dotenv()
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
+csrf = CSRFProtect()
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=['200 per day', '50 per hour'],
+    storage_uri='memory://',
+)
 
 
 def create_app():
@@ -22,6 +34,48 @@ def create_app():
     login_manager.login_view = 'auth.login'
     login_manager.login_message = 'Por favor autentique-se para aceder a esta página.'
     login_manager.login_message_category = 'warning'
+
+    csrf.init_app(app)
+    limiter.init_app(app)
+
+    @app.before_request
+    def gerar_csp_nonce():
+        g.csp_nonce = secrets.token_urlsafe(16)
+
+    @app.context_processor
+    def injectar_csp_nonce():
+        return {'csp_nonce': g.get('csp_nonce', '')}
+
+    @app.after_request
+    def aplicar_headers_seguranca(response):
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.headers['X-Frame-Options'] = 'DENY'
+        response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+        response.headers['Permissions-Policy'] = 'geolocation=(), microphone=(), camera=()'
+        response.headers['Content-Security-Policy'] = (
+            "default-src 'self'; "
+            f"script-src 'self' 'nonce-{g.get('csp_nonce', '')}' https://cdn.jsdelivr.net; "
+            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+            "font-src 'self' https://cdn.jsdelivr.net data:; "
+            "img-src 'self' data:; "
+            "object-src 'none'; "
+            "base-uri 'self'; "
+            "form-action 'self'; "
+            "frame-ancestors 'none'"
+        )
+        if request.is_secure:
+            response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+        return response
+
+    @app.errorhandler(CSRFError)
+    def erro_csrf(e):
+        flash('O formulário expirou ou é inválido. Tente novamente.', 'warning')
+        return redirect(request.referrer or url_for('main.index'))
+
+    @app.errorhandler(429)
+    def erro_rate_limit(e):
+        flash('Demasiadas tentativas. Aguarde um momento antes de tentar novamente.', 'danger')
+        return redirect(request.referrer or url_for('main.index')), 429
 
     @login_manager.user_loader
     def load_user(user_id):
