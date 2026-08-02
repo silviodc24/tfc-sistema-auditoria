@@ -1,6 +1,6 @@
 import secrets
 
-from flask import Flask, current_app, flash, g, redirect, request, url_for
+from flask import Flask, current_app, flash, g, redirect, request, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
@@ -8,6 +8,7 @@ from flask_wtf import CSRFProtect
 from flask_wtf.csrf import CSRFError
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from werkzeug.middleware.proxy_fix import ProxyFix
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -27,6 +28,11 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object('app.config.Config')
 
+    # Railway (e qualquer PaaS atras de proxy reverso) termina o TLS antes do
+    # processo Gunicorn e reenvia via HTTP interno com X-Forwarded-*.
+    # Sem isto, request.remote_addr e request.is_secure ficam sempre errados.
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
+
     db.init_app(app)
     migrate.init_app(app, db)
 
@@ -41,6 +47,12 @@ def create_app():
     @app.before_request
     def gerar_csp_nonce():
         g.csp_nonce = secrets.token_urlsafe(16)
+
+    @app.before_request
+    def marcar_sessao_permanente():
+        # Sem isto, PERMANENT_SESSION_LIFETIME e ignorado — sessoes do
+        # Flask nao sao "permanentes" por omissao.
+        session.permanent = True
 
     @app.context_processor
     def injectar_csp_nonce():

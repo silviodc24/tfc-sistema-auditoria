@@ -1,3 +1,4 @@
+from urllib.parse import urlparse
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from app.models.utilizador import Utilizador
@@ -26,9 +27,16 @@ def login():
         login_user(utilizador)
         flash(f'Bem-vindo, {utilizador.nome}.', 'success')
 
-        # Redireciona para a pagina que o utilizador tentou aceder
+        # Redireciona para a pagina que o utilizador tentou aceder.
+        # So aceita caminhos relativos — um 'next' absoluto permitiria
+        # redireccionar para um dominio externo apos o login (open redirect).
         proxima = request.args.get('next')
-        return redirect(proxima or url_for('main.index'))
+        destino_seguro = (
+            proxima
+            and urlparse(proxima).netloc == ''
+            and urlparse(proxima).scheme == ''
+        )
+        return redirect(proxima if destino_seguro else url_for('main.index'))
 
     return render_template('auth/login.html')
 
