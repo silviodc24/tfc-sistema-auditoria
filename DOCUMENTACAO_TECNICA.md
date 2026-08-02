@@ -41,7 +41,7 @@ A verificação manual da conformidade dos processos de aquisição apresenta tr
 ### O que o sistema faz
 
 1. Recebe dados de aquisições importados de sistemas ERP via ficheiros CSV
-2. Aplica automaticamente 16 regras de negócio sobre esses dados
+2. Aplica automaticamente 13 regras de negócio sobre esses dados
 3. Classifica cada aquisição como conforme ou não conforme
 4. Regista todas as irregularidades detectadas com descrição, gravidade e rastreabilidade
 5. Gera relatórios em PDF e Excel para suporte à decisão do auditor
@@ -308,26 +308,23 @@ O motor é orientado a dados — as regras não estão hardcoded no código mas 
 - Desactivar uma regra não apaga o histórico de violações anteriores
 - Os limiares numéricos são configuráveis pelo administrador em runtime
 
-### As 16 regras implementadas
+### As 13 regras implementadas
 
 | Código | Nome | Tipo | Gravidade |
 |---|---|---|---|
 | RN01 | Saldo orçamental insuficiente | Orçamental | Crítica |
-| RN02 | Centro de custo inválido | Orçamental | Crítica |
+| RN02 | Centro de custo inválido | Integridade | Crítica |
 | RN03 | Período orçamental não definido | Orçamental | Alta |
-| RN04 | Dados obrigatórios em falta | Orçamental | Crítica |
+| RN04 | Dados obrigatórios em falta | Integridade | Crítica |
 | RN05 | Aprovação hierárquica insuficiente | Autorização | Crítica |
 | RN06 | Perfil de aprovador incompatível | Autorização | Alta |
-| RN07 | Solicitante igual ao aprovador | Autorização | Crítica |
+| RN07 | Solicitante igual ao aprovador | Integridade | Crítica |
 | RN08 | Solicitante não identificado | Procedimental | Alta |
 | RN09 | Documentação em falta | Procedimental | Alta |
 | RN10 | Confirmação de recepção em falta | Procedimental | Alta |
 | RN11 | Identificação única em falta | Integridade | Crítica |
 | RN12 | Inconsistência de datas | Integridade | Alta |
 | RN13 | Registo duplicado | Integridade | Crítica |
-| RN14 | Classificação automática | Integridade | Crítica |
-| RN15 | Registo de não conformidade | Integridade | Alta |
-| RN16 | Relatório de auditoria | Integridade | Média |
 
 ### Lógica de execução
 
@@ -783,7 +780,6 @@ O sistema é um MVP académico desenvolvido em ambiente controlado com utilizado
 | Sem protecção CSRF | Segurança — vulnerável a ataques externos | Flask-WTF |
 | Sem rate limiting no login | Segurança — força bruta possível | Flask-Limiter |
 | Sem headers de segurança HTTP | Segurança — XSS e clickjacking | Flask-Talisman |
-| RN02, RN03, RN04, RN08 garantidas pelo ERP | Cobertura — não detectadas pelo motor | Módulo de staging |
 | `valor_executado` não actualizado dinamicamente | Precisão do saldo | Recálculo automático |
 | Sem paginação nas listagens | Performance com grandes volumes | Flask-SQLAlchemy pagination |
 | Query N+1 no dashboard | Performance | Query com GROUP BY |

@@ -67,6 +67,13 @@ def editar_regra(id):
     if request.method == 'POST':
         valor = request.form.get('valor_referencia')
         regra.valor_referencia = float(valor) if valor else None
+
+        gravidade = request.form.get('gravidade')
+        if gravidade not in ('baixa', 'media', 'alta', 'critica'):
+            flash('Gravidade inválida.', 'danger')
+            return render_template('configuracao/editar_regra.html', regra=regra)
+        regra.gravidade = gravidade
+
         db.session.commit()
         flash(f'Regra {regra.codigo} actualizada com sucesso.', 'success')
         return redirect(url_for('configuracao.regras'))

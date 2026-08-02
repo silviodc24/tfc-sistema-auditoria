@@ -42,6 +42,19 @@
                             Deixe vazio para regras sem valor de referência.
                         </div>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">Gravidade</label>
+                        <select class="form-select" name="gravidade">
+                            {% for opcao in ['baixa', 'media', 'alta', 'critica'] %}
+                            <option value="{{ opcao }}" {% if regra.gravidade == opcao %}selected{% endif %}>
+                                {{ opcao | capitalize }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">
+                            Nível de gravidade atribuído às não conformidades geradas por esta regra.
+                        </div>
+                    </div>
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-check-lg"></i> Guardar

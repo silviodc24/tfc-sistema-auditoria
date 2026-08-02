@@ -6,6 +6,7 @@ from app.models.nao_conformidade import NaoConformidade
 from app.models.aquisicao import Aquisicao
 from app.models.colaborador import Colaborador
 from app.models.orcamento import Orcamento
+from app.models.centro_custo import CentroCusto
 from decimal import Decimal
 
 # =============================================================================
@@ -18,6 +19,14 @@ DESCRICOES_VIOLACAO = {
         f"Saldo orcamental insuficiente — valor da aquisicao "
         f"({a.valor} Kz) excede o saldo disponivel ({saldo} Kz) "
         f"no orcamento do centro de custo {a.id_centro}."
+    ),
+    'RN02': lambda a, **_: (
+        f"Centro de custo invalido ou inactivo — id_centro {a.id_centro} "
+        f"nao corresponde a um centro de custo valido e activo."
+    ),
+    'RN03': lambda a, **_: (
+        f"Periodo orcamental nao definido — a aquisicao {a.id_aquisicao} "
+        f"nao possui um orcamento valido associado (id_orcamento {a.id_orcamento})."
     ),
     'RN04': lambda a, **_: (
         f"Valor da aquisicao invalido — valor registado: {a.valor} Kz. "
@@ -133,6 +142,16 @@ def avaliar_regra(aquisicao, regra, regra_rn05):
         if saldo is not None and aquisicao.valor > saldo:
             return True, DESCRICOES_VIOLACAO['RN01'](aquisicao, saldo)
 
+    elif regra.codigo == 'RN02':
+        centro = CentroCusto.query.get(aquisicao.id_centro)
+        if not centro or not centro.ativo:
+            return True, DESCRICOES_VIOLACAO['RN02'](aquisicao)
+
+    elif regra.codigo == 'RN03':
+        orcamento = Orcamento.query.get(aquisicao.id_orcamento)
+        if not orcamento or not orcamento.periodo:
+            return True, DESCRICOES_VIOLACAO['RN03'](aquisicao)
+
     elif regra.codigo == 'RN04':
         if not aquisicao.valor or aquisicao.valor <= 0:
             return True, DESCRICOES_VIOLACAO['RN04'](aquisicao)
@@ -171,6 +190,18 @@ def avaliar_regra(aquisicao, regra, regra_rn05):
         if aquisicao.data_aprovacao and aquisicao.data_solicitacao:
             if aquisicao.data_aprovacao < aquisicao.data_solicitacao:
                 return True, DESCRICOES_VIOLACAO['RN12'](aquisicao)
+
+    elif regra.codigo == 'RN13':
+        duplicado = Aquisicao.query.filter(
+            Aquisicao.id_aquisicao != aquisicao.id_aquisicao,
+            Aquisicao.id_centro == aquisicao.id_centro,
+            Aquisicao.id_solicitante == aquisicao.id_solicitante,
+            Aquisicao.valor == aquisicao.valor,
+            Aquisicao.data_solicitacao == aquisicao.data_solicitacao,
+            Aquisicao.descricao == aquisicao.descricao
+        ).first()
+        if duplicado:
+            return True, DESCRICOES_VIOLACAO['RN13'](aquisicao)
 
     return False, None
 
