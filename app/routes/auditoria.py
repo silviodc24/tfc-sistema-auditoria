@@ -14,6 +14,9 @@ auditoria_bp = Blueprint('auditoria', __name__, url_prefix='/auditoria')
 @login_required
 def index():
     """Lista todas as sessoes de auditoria."""
+    if current_user.is_admin:
+        flash('Acesso restrito a auditores.', 'warning')
+        return redirect(url_for('main.index'))
     auditorias = Auditoria.query.order_by(Auditoria.data_execucao.desc()).all()
     return render_template('auditoria/index.html', auditorias=auditorias)
 
@@ -21,12 +24,18 @@ def index():
 @login_required
 def iniciar():
     """Redireciona para aquisicoes com mensagem a pedir seleccao."""
+    if current_user.is_admin:
+        flash('Acesso restrito a auditores.', 'warning')
+        return redirect(url_for('main.index'))
     flash('Seleccione as aquisições que pretende auditar.', 'info')
     return redirect(url_for('aquisicao.index'))
 
 @auditoria_bp.route('/nova', methods=['GET', 'POST'])
 @login_required
 def nova():
+    if current_user.is_admin:
+        flash('Acesso restrito a auditores.', 'warning')
+        return redirect(url_for('main.index'))
     # Recebe os IDs seleccionados na pagina de aquisicoes
     ids_aquisicao = request.form.getlist(
         'ids_aquisicao') or request.args.getlist('ids_aquisicao')
@@ -81,6 +90,9 @@ def nova():
 @login_required
 def exportar_pdf(id):
     """Exporta o relatorio de auditoria em PDF."""
+    if current_user.is_admin:
+        flash('Acesso restrito a auditores.', 'warning')
+        return redirect(url_for('main.index'))
     auditoria = Auditoria.query.get_or_404(id)
     buffer = gerar_pdf(auditoria)
     nome_ficheiro = f"auditoria_{auditoria.id_auditoria}_{auditoria.periodo_analisado}.pdf"
@@ -96,6 +108,9 @@ def exportar_pdf(id):
 @login_required
 def exportar_excel(id):
     """Exporta o relatorio de auditoria em Excel."""
+    if current_user.is_admin:
+        flash('Acesso restrito a auditores.', 'warning')
+        return redirect(url_for('main.index'))
     auditoria = Auditoria.query.get_or_404(id)
     buffer = gerar_excel(auditoria)
     nome_ficheiro = f"auditoria_{auditoria.id_auditoria}_{auditoria.periodo_analisado}.xlsx"
@@ -111,5 +126,8 @@ def exportar_excel(id):
 @login_required
 def detalhe(id):
     """Mostra o detalhe de uma sessao de auditoria."""
+    if current_user.is_admin:
+        flash('Acesso restrito a auditores.', 'warning')
+        return redirect(url_for('main.index'))
     auditoria = Auditoria.query.get_or_404(id)
     return render_template('auditoria/detalhe.html', auditoria=auditoria)

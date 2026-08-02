@@ -1,8 +1,8 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 from app.models.aquisicao import Aquisicao
 from app.models.centro_custo import CentroCusto
 from app.models.orcamento import Orcamento
-from flask_login import login_required
+from flask_login import login_required, current_user
 
 aquisicao_bp = Blueprint('aquisicao', __name__, url_prefix='/aquisicoes')
 
@@ -11,6 +11,9 @@ aquisicao_bp = Blueprint('aquisicao', __name__, url_prefix='/aquisicoes')
 @login_required
 def index():
     """Lista todas as aquisicoes com filtros opcionais."""
+    if current_user.is_admin:
+        flash('Acesso restrito a auditores.', 'warning')
+        return redirect(url_for('main.index'))
     id_centro = request.args.get('id_centro', '')
     periodo = request.args.get('periodo', '')
     status = request.args.get('status', '')

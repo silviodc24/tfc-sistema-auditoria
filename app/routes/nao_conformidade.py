@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from app import db
 from app.models.nao_conformidade import NaoConformidade
 from app.models.regra_auditoria import RegraAuditoria
-from flask_login import login_required
+from flask_login import login_required, current_user
 
 nc_bp = Blueprint('nao_conformidade', __name__, url_prefix='/nao-conformidades')
 
@@ -11,6 +11,9 @@ nc_bp = Blueprint('nao_conformidade', __name__, url_prefix='/nao-conformidades')
 @login_required
 def index():
     """Lista todas as nao conformidades com filtros opcionais."""
+    if current_user.is_admin:
+        flash('Acesso restrito a auditores.', 'warning')
+        return redirect(url_for('main.index'))
     gravidade = request.args.get('gravidade', '')
     status = request.args.get('status', '')
     id_regra = request.args.get('id_regra', '')
@@ -43,6 +46,9 @@ def index():
 @login_required
 def actualizar(id):
     """Actualiza o status e comentario de uma nao conformidade."""
+    if current_user.is_admin:
+        flash('Acesso restrito a auditores.', 'warning')
+        return redirect(url_for('main.index'))
     nc = NaoConformidade.query.get_or_404(id)
     novo_status = request.form.get('status')
     comentario = request.form.get('comentario_auditor')
