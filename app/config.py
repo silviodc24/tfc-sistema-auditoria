@@ -27,7 +27,7 @@ class Config:
     SESSION_COOKIE_SECURE = not DEBUG
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
-    PERMANENT_SESSION_LIFETIME = timedelta(minutes=15)
+    PERMANENT_SESSION_LIFETIME = timedelta(minutes=5)
 
     WTF_CSRF_SSL_STRICT = not DEBUG
 

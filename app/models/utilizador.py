@@ -13,6 +13,7 @@ class Utilizador(db.Model, UserMixin):
     perfil = db.Column(db.Enum('auditor', 'administrador'),
                        nullable=False, default='auditor')
     ativo = db.Column(db.Boolean, nullable=False, default=True)
+    tentativas_falhadas = db.Column(db.Integer, nullable=False, default=0)
 
     auditorias = db.relationship('Auditoria', backref='utilizador', lazy=True)
 

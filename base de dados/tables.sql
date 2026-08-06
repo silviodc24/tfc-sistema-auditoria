@@ -4,8 +4,10 @@ create table utilizador (
     id_utilizador  INT          NOT NULL AUTO_INCREMENT,
     nome           VARCHAR(100) NOT NULL,
     email          VARCHAR(150) NOT NULL,
+    password_hash  VARCHAR(255) NOT NULL,
     perfil         ENUM('auditor','administrador') NOT NULL DEFAULT 'auditor',
     ativo          BOOLEAN      NOT NULL DEFAULT TRUE,
+    tentativas_falhadas INT     NOT NULL DEFAULT 0,
 
     CONSTRAINT pk_utilizador PRIMARY KEY (id_utilizador),
     CONSTRAINT uq_utilizador_email UNIQUE (email)

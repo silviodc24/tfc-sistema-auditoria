@@ -1,3 +1,4 @@
+import re
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from app import db
@@ -13,6 +14,31 @@ from app.services.importacao import (
 )
 
 config_bp = Blueprint('configuracao', __name__, url_prefix='/configuracao')
+
+
+def validar_politica_password(password, nome='', email=''):
+    """Valida a password contra a politica minima do sistema.
+    Devolve (True, None) se valida, (False, mensagem) caso contrario.
+    """
+    if len(password) < 10:
+        return False, 'A password deve ter pelo menos 10 caracteres.'
+    if not re.search(r'[A-Z]', password):
+        return False, 'A password deve conter pelo menos uma letra maiúscula.'
+    if not re.search(r'[a-z]', password):
+        return False, 'A password deve conter pelo menos uma letra minúscula.'
+    if not re.search(r'[0-9]', password):
+        return False, 'A password deve conter pelo menos um dígito.'
+    if not re.search(r'[^A-Za-z0-9]', password):
+        return False, 'A password deve conter pelo menos um caracter especial.'
+
+    password_lower = password.lower()
+    partes_triviais = [p.lower() for p in nome.split() if len(p) >= 4]
+    if email:
+        partes_triviais.append(email.split('@')[0].lower())
+    if any(parte in password_lower for parte in partes_triviais if parte):
+        return False, 'A password não pode conter o nome ou o email do utilizador.'
+
+    return True, None
 
 
 def admin_required():
@@ -136,6 +162,11 @@ def novo_utilizador():
             flash('Já existe um utilizador com este email.', 'danger')
             return render_template('configuracao/novo_utilizador.html')
 
+        valida, erro = validar_politica_password(password, nome, email)
+        if not valida:
+            flash(erro, 'danger')
+            return render_template('configuracao/novo_utilizador.html')
+
         u = Utilizador(nome=nome, email=email, perfil=perfil)
         u.set_password(password)
         db.session.add(u)
@@ -156,6 +187,10 @@ def toggle_utilizador(id):
         flash('Não pode desactivar a sua própria conta.', 'danger')
         return redirect(url_for('configuracao.utilizadores'))
     u.ativo = not u.ativo
+    if u.ativo:
+        # Reactivacao manual limpa o historico de tentativas falhadas —
+        # senao a conta ficaria a um erro de ser bloqueada outra vez.
+        u.tentativas_falhadas = 0
     db.session.commit()
     estado = 'activado' if u.ativo else 'desactivado'
     flash(f'Utilizador {u.nome} {estado} com sucesso.', 'success')
