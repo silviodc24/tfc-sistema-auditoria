@@ -31,17 +31,19 @@
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
                         <label class="form-label">Nome completo</label>
-                        <input type="text" class="form-control" name="nome" required>
+                        <input type="text" class="form-control" name="nome"
+                               value="{{ nome or '' }}" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Email</label>
-                        <input type="email" class="form-control" name="email" required>
+                        <input type="email" class="form-control" name="email"
+                               value="{{ email or '' }}" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Perfil</label>
                         <select class="form-select" name="perfil" required>
-                            <option value="auditor">Auditor</option>
-                            <option value="administrador">Administrador</option>
+                            <option value="auditor" {% if perfil == 'auditor' %}selected{% endif %}>Auditor</option>
+                            <option value="administrador" {% if perfil == 'administrador' %}selected{% endif %}>Administrador</option>
                         </select>
                     </div>
                     <div class="mb-3">

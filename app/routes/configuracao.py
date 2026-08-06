@@ -160,12 +160,14 @@ def novo_utilizador():
 
         if Utilizador.query.filter_by(email=email).first():
             flash('Já existe um utilizador com este email.', 'danger')
-            return render_template('configuracao/novo_utilizador.html')
+            return render_template('configuracao/novo_utilizador.html',
+                                    nome=nome, email=email, perfil=perfil)
 
         valida, erro = validar_politica_password(password, nome, email)
         if not valida:
             flash(erro, 'danger')
-            return render_template('configuracao/novo_utilizador.html')
+            return render_template('configuracao/novo_utilizador.html',
+                                    nome=nome, email=email, perfil=perfil)
 
         u = Utilizador(nome=nome, email=email, perfil=perfil)
         u.set_password(password)

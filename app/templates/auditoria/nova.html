@@ -20,7 +20,7 @@
 </a>
 
 {% else %}
-<form method="POST">
+<form method="POST" id="form-nova-auditoria">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     {% for id in ids_aquisicao %}
         <input type="hidden" name="ids_aquisicao" value="{{ id }}">
@@ -56,7 +56,7 @@
                         </div>
                     </div>
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-success">
+                        <button type="submit" class="btn btn-success" id="btn-executar-auditoria">
                             <i class="bi bi-play-circle"></i> Executar Auditoria
                         </button>
                         <a href="{{ url_for('aquisicao.index') }}" class="btn btn-outline-secondary">
@@ -75,7 +75,7 @@
                         Aquisições a auditar — {{ aquisicoes_seleccionadas|length }} seleccionada(s)
                     </h6>
                 </div>
-                <div class="card-body p-0">
+                <div class="card-body p-0 table-responsive">
                     <table class="table table-hover mb-0">
                         <thead class="table-light">
                             <tr>
@@ -112,4 +112,16 @@
     </div>
 </form>
 {% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script nonce="{{ csp_nonce }}">
+    // Evita criar duas sessoes de auditoria com um duplo-clique
+    const formNovaAuditoria = document.getElementById('form-nova-auditoria');
+    if (formNovaAuditoria) {
+        formNovaAuditoria.addEventListener('submit', function() {
+            document.getElementById('btn-executar-auditoria').disabled = true;
+        });
+    }
+</script>
 {% endblock %}

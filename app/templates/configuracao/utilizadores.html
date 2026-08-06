@@ -21,7 +21,7 @@
 </div>
 
 <div class="card">
-    <div class="card-body p-0">
+    <div class="card-body p-0 table-responsive">
         <table class="table table-hover mb-0">
             <thead class="table-light">
                 <tr>
@@ -55,7 +55,8 @@
                     </td>
                     <td>
                         <form method="POST"
-                              action="{{ url_for('configuracao.toggle_utilizador', id=u.id_utilizador) }}">
+                              action="{{ url_for('configuracao.toggle_utilizador', id=u.id_utilizador) }}"
+                              {% if u.ativo %}class="form-confirmar-desactivacao"{% endif %}>
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <button type="submit"
                                     class="btn btn-sm {% if u.ativo %}btn-outline-danger{% else %}btn-outline-success{% endif %}"
@@ -74,4 +75,17 @@
         </table>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script nonce="{{ csp_nonce }}">
+    // Confirmacao antes de desactivar um utilizador (CSP bloqueia onsubmit inline)
+    document.querySelectorAll('.form-confirmar-desactivacao').forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            if (!confirm('Desactivar este utilizador? Deixa de conseguir iniciar sessão até ser reactivado.')) {
+                e.preventDefault();
+            }
+        });
+    });
+</script>
 {% endblock %}

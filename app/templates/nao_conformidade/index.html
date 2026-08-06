@@ -11,7 +11,7 @@
 <!-- FILTROS -->
 <div class="card mb-4">
     <div class="card-body">
-        <form method="GET" class="row g-3">
+        <form method="GET" class="row g-3" id="form-filtros">
             <div class="col-md-3">
                 <label class="form-label">Gravidade</label>
                 <select class="form-select" name="gravidade">
@@ -44,12 +44,9 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-2 d-flex align-items-end gap-2">
-                <button type="submit" class="btn btn-primary w-100">
-                    <i class="bi bi-funnel"></i> Filtrar
-                </button>
+            <div class="col-md-2 d-flex align-items-end">
                 <a href="{{ url_for('nao_conformidade.index') }}" class="btn btn-outline-secondary w-100">
-                    Limpar
+                    <i class="bi bi-x-circle"></i> Limpar
                 </a>
             </div>
         </form>
@@ -58,7 +55,7 @@
 
 <!-- LISTAGEM -->
 <div class="card">
-    <div class="card-body p-0">
+    <div class="card-body p-0 table-responsive">
         <table class="table table-hover mb-0">
             <thead class="table-light">
                 <tr>
@@ -192,4 +189,15 @@
         </table>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script nonce="{{ csp_nonce }}">
+    // Auto-aplicar filtros ao mudar qualquer select (CSP bloqueia onchange inline)
+    document.querySelectorAll('#form-filtros select').forEach(function(select) {
+        select.addEventListener('change', function() {
+            document.getElementById('form-filtros').submit();
+        });
+    });
+</script>
 {% endblock %}
