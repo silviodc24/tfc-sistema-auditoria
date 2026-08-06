@@ -207,6 +207,8 @@ def toggle_utilizador(id):
 @login_required
 def importacao():
     """Hub de importacao de dados."""
+    if not admin_required():
+        return redirect(url_for('configuracao.index'))
     return render_template('configuracao/importacao.html')
 
 # =============================================================================
@@ -216,6 +218,8 @@ def importacao():
 @config_bp.route('/importacao/colaboradores', methods=['POST'])
 @login_required
 def importar_colaboradores_route():
+    if not admin_required():
+        return redirect(url_for('configuracao.index'))
     ficheiro = request.files.get('ficheiro')
     if not ficheiro or ficheiro.filename == '':
         flash('Nenhum ficheiro seleccionado.', 'danger')
@@ -240,6 +244,8 @@ def importar_colaboradores_route():
 @config_bp.route('/importacao/centros-custo', methods=['POST'])
 @login_required
 def importar_centros_route():
+    if not admin_required():
+        return redirect(url_for('configuracao.index'))
     ficheiro = request.files.get('ficheiro')
     if not ficheiro or ficheiro.filename == '':
         flash('Nenhum ficheiro seleccionado.', 'danger')
@@ -264,6 +270,8 @@ def importar_centros_route():
 @config_bp.route('/importacao/orcamentos', methods=['POST'])
 @login_required
 def importar_orcamentos_route():
+    if not admin_required():
+        return redirect(url_for('configuracao.index'))
     ficheiro = request.files.get('ficheiro')
     if not ficheiro or ficheiro.filename == '':
         flash('Nenhum ficheiro seleccionado.', 'danger')
@@ -288,6 +296,8 @@ def importar_orcamentos_route():
 @config_bp.route('/importacao/aquisicoes', methods=['POST'])
 @login_required
 def importar_aquisicoes_route():
+    if not admin_required():
+        return redirect(url_for('configuracao.index'))
     ficheiro = request.files.get('ficheiro')
     if not ficheiro or ficheiro.filename == '':
         flash('Nenhum ficheiro seleccionado.', 'danger')
