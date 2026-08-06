@@ -199,6 +199,79 @@ def toggle_utilizador(id):
     return redirect(url_for('configuracao.utilizadores'))
 
 
+@config_bp.route('/utilizadores/<int:id>/editar', methods=['GET', 'POST'])
+@login_required
+def editar_utilizador(id):
+    """
+    Edicao de nome e perfil por um administrador — nunca da propria conta
+    (segregacao de funcoes: precisa de ser outro administrador a faze-lo).
+    """
+    if not admin_required():
+        return redirect(url_for('configuracao.index'))
+    u = Utilizador.query.get_or_404(id)
+    if u.id_utilizador == current_user.id_utilizador:
+        flash('Não pode editar o seu próprio nome ou perfil — peça a outro administrador.', 'danger')
+        return redirect(url_for('configuracao.utilizadores'))
+
+    if request.method == 'POST':
+        nome = request.form.get('nome', '').strip()
+        perfil = request.form.get('perfil')
+
+        if not nome:
+            flash('O nome não pode ficar vazio.', 'danger')
+            return render_template('configuracao/editar_utilizador.html', utilizador=u)
+        if perfil not in ('auditor', 'administrador'):
+            flash('Perfil inválido.', 'danger')
+            return render_template('configuracao/editar_utilizador.html', utilizador=u)
+
+        u.nome = nome
+        u.perfil = perfil
+        db.session.commit()
+        flash(f'Utilizador {u.nome} actualizado com sucesso.', 'success')
+        return redirect(url_for('configuracao.utilizadores'))
+
+    return render_template('configuracao/editar_utilizador.html', utilizador=u)
+
+
+# =============================================================================
+# O MEU PERFIL (self-service — qualquer utilizador autenticado, sem admin_required)
+# =============================================================================
+
+@config_bp.route('/perfil')
+@login_required
+def perfil():
+    """Pagina de gestao do proprio perfil. So a password e editavel aqui —
+    nome e perfil sao geridos exclusivamente por outro administrador."""
+    return render_template('configuracao/perfil.html')
+
+
+@config_bp.route('/perfil/password', methods=['POST'])
+@login_required
+def alterar_password():
+    """Qualquer utilizador pode mudar a sua propria password — nunca a de outro."""
+    password_actual = request.form.get('password_actual', '')
+    password_nova = request.form.get('password_nova', '')
+    password_confirmar = request.form.get('password_confirmar', '')
+
+    if not current_user.check_password(password_actual):
+        flash('Password actual incorrecta.', 'danger')
+        return redirect(url_for('configuracao.perfil'))
+
+    if password_nova != password_confirmar:
+        flash('A nova password e a confirmação não coincidem.', 'danger')
+        return redirect(url_for('configuracao.perfil'))
+
+    valida, erro = validar_politica_password(password_nova, current_user.nome, current_user.email)
+    if not valida:
+        flash(erro, 'danger')
+        return redirect(url_for('configuracao.perfil'))
+
+    current_user.set_password(password_nova)
+    db.session.commit()
+    flash('Password alterada com sucesso.', 'success')
+    return redirect(url_for('configuracao.perfil'))
+
+
 # =============================================================================
 # IMPORTACAO DE DADOS
 # =============================================================================

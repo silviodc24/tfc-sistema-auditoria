@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}O Meu Perfil{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2><i class="bi bi-person-circle"></i> O Meu Perfil</h2>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="{{ url_for('configuracao.index') }}">Configuração</a>
+                </li>
+                <li class="breadcrumb-item active">O Meu Perfil</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+
+        <!-- DADOS DA CONTA (so leitura) -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-info-circle"></i> Dados da Conta</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Nome</label>
+                    <p class="text-muted">{{ current_user.nome }}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Email</label>
+                    <p class="text-muted">{{ current_user.email }}</p>
+                </div>
+                <div class="mb-0">
+                    <label class="form-label fw-bold">Perfil</label>
+                    <p class="mb-0">
+                        {% if current_user.is_admin %}
+                            <span class="badge bg-danger">Administrador</span>
+                        {% else %}
+                            <span class="badge bg-primary">Auditor</span>
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="form-text mt-2">
+                    Nome e perfil só podem ser alterados por outro administrador,
+                    em Gestão de Utilizadores.
+                </div>
+            </div>
+        </div>
+
+        <!-- ALTERAR PASSWORD -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-key"></i> Alterar Password</h6>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('configuracao.alterar_password') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label class="form-label">Password actual</label>
+                        <input type="password" class="form-control" name="password_actual" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nova password</label>
+                        <input type="password" class="form-control" name="password_nova" minlength="10" required>
+                        <div class="form-text">
+                            Mínimo 10 caracteres, com maiúscula, minúscula, dígito e
+                            caracter especial. Não pode conter o seu nome ou email.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Confirmar nova password</label>
+                        <input type="password" class="form-control" name="password_confirmar" minlength="10" required>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg"></i> Alterar Password
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

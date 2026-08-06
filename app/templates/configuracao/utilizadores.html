@@ -53,7 +53,12 @@
                             <span class="badge bg-secondary">Inactivo</span>
                         {% endif %}
                     </td>
-                    <td>
+                    <td class="d-flex gap-2">
+                        <a href="{% if u.id_utilizador != current_user.id_utilizador %}{{ url_for('configuracao.editar_utilizador', id=u.id_utilizador) }}{% else %}#{% endif %}"
+                           class="btn btn-sm btn-outline-primary {% if u.id_utilizador == current_user.id_utilizador %}disabled{% endif %}"
+                           title="{% if u.id_utilizador == current_user.id_utilizador %}Peça a outro administrador para editar a sua própria conta{% else %}Editar nome e perfil{% endif %}">
+                            <i class="bi bi-pencil"></i>
+                        </a>
                         <form method="POST"
                               action="{{ url_for('configuracao.toggle_utilizador', id=u.id_utilizador) }}"
                               {% if u.ativo %}class="form-confirmar-desactivacao"{% endif %}>
