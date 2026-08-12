@@ -125,11 +125,21 @@ a { text-decoration: none; }
     border-left: none;
 }
 
-/* utilizador autenticado (nome + perfil) no topo da sidebar */
+/* utilizador autenticado (nome + perfil) no topo da sidebar — clicavel, vai para "O Meu Perfil" */
 .sidebar-user {
     display: flex;
     align-items: center;
     gap: 10px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.sidebar-user:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-user.active {
+    background: rgba(255, 255, 255, 0.16);
 }
 
 .sidebar-user-icon {

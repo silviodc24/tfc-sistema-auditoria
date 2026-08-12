@@ -22,7 +22,9 @@
         </div>
 
          {% if current_user.is_authenticated %}
-         <div class="sidebar-user px-3 py-2 border-bottom border-white border-opacity-25">
+         <a href="{{ url_for('configuracao.perfil') }}"
+            class="sidebar-user px-3 py-2 border-bottom border-white border-opacity-25 {% if request.endpoint == 'configuracao.perfil' %}active{% endif %}"
+            title="O Meu Perfil">
                 <i class="bi bi-person-circle sidebar-user-icon"></i>
                 <div class="sidebar-user-text">
                     <small class="text-white-50 d-block">{{ current_user.nome }}</small>
@@ -30,7 +32,7 @@
                         {{ current_user.perfil.title() }}
                     </small>
                 </div>
-            </div>
+            </a>
         {% endif %}
 
         <ul class="nav flex-column mt-4">
