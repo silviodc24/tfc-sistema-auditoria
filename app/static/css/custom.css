@@ -1,15 +1,61 @@
-/* SIDEBAR */
+/* =============================================================================
+   TOKENS
+   Paleta mantida (azul #0d6efd + branco) — só o tratamento visual mudou.
+   ============================================================================= */
+:root {
+    --brand: #0d6efd;
+    --brand-dark: #0b5ed7;
+    --brand-darker: #0a58ca;
+    --ink: #1b2430;
+    --ink-soft: #5c6773;
+    --line: #e7eaee;
+    --radius: 10px;
+    --radius-sm: 8px;
+    --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04), 0 4px 12px rgba(16, 24, 40, 0.06);
+    --shadow-card-hover: 0 2px 4px rgba(16, 24, 40, 0.06), 0 8px 20px rgba(16, 24, 40, 0.09);
+
+    /* pastilhas de estado — tom suave + texto colorido, cor mantida por categoria */
+    --chip-success-bg: #e1f3e8; --chip-success-ink: #146c43;
+    --chip-danger-bg:  #fbe4e6; --chip-danger-ink:  #b02a37;
+    --chip-warning-bg: #fdecd3; --chip-warning-ink: #8a5a00;
+    --chip-info-bg:    #dcebff; --chip-info-ink:    #0a58ca;
+    --chip-secondary-bg: #eaecef; --chip-secondary-ink: #495057;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 0.95rem;
+    color: var(--ink);
+    background-color: #f4f6f9;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--ink);
+    font-weight: 600;
+}
+
+/* números alinhados verticalmente — extractos, valores, IDs */
+table td, .fs-1, .fs-4 {
+    font-variant-numeric: tabular-nums;
+}
+
+a { text-decoration: none; }
+
+/* =============================================================================
+   SIDEBAR
+   ============================================================================= */
 .sidebar {
     position: fixed;
     top: 0;
     left: 0;
     width: 260px;
     height: 100vh;
-    background: #0d6efd;
+    background: linear-gradient(165deg, var(--brand) 0%, var(--brand-darker) 100%);
     color: white;
-    transition: all 0.3s ease;
+    transition: all 0.25s ease;
     overflow-x: hidden;
     z-index: 1000;
+    box-shadow: 2px 0 16px rgba(10, 88, 202, 0.18);
 }
 
 .sidebar.collapsed {
@@ -19,15 +65,16 @@
 .sidebar-header {
     display: flex;
     align-items: center;
-    padding: 16px 15px;
-    border-bottom: 1px solid rgba(255,255,255,0.15);
+    padding: 18px 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .logo-text {
     white-space: nowrap;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 1rem;
-    transition: all 0.3s ease;
+    letter-spacing: 0.01em;
+    transition: all 0.25s ease;
 }
 
 .sidebar.collapsed .logo-text {
@@ -35,29 +82,34 @@
 }
 
 .sidebar .nav-link {
-    color: rgba(255,255,255,0.85);
-    padding: 12px 20px;
+    color: rgba(255, 255, 255, 0.82);
+    padding: 11px 20px;
+    margin: 1px 10px;
+    border-radius: var(--radius-sm);
     display: flex;
     align-items: center;
     gap: 12px;
-    font-size: 0.95rem;
-    transition: background 0.2s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background 0.15s ease, color 0.15s ease;
     white-space: nowrap;
+    border-left: 3px solid transparent;
 }
 
 .sidebar .nav-link:hover {
-    background: rgba(255,255,255,0.15);
+    background: rgba(255, 255, 255, 0.12);
     color: white;
 }
 
 .sidebar .nav-link.active {
-    background: rgba(255,255,255,0.25);
+    background: rgba(255, 255, 255, 0.16);
     color: white;
-    font-weight: 500;
+    font-weight: 600;
+    border-left: 3px solid white;
 }
 
 .sidebar .nav-link i {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     min-width: 20px;
     text-align: center;
 }
@@ -68,13 +120,50 @@
 
 .sidebar.collapsed .nav-link {
     justify-content: center;
-    padding: 12px;
+    padding: 11px;
+    margin: 1px 8px;
+    border-left: none;
 }
 
-/* CONTEUDO PRINCIPAL */
+/* utilizador autenticado (nome + perfil) no topo da sidebar */
+.sidebar-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sidebar-user-icon {
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
+
+.sidebar-user-text {
+    min-width: 0;
+    overflow: hidden;
+}
+
+.sidebar-user-text small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sidebar.collapsed .sidebar-user {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.sidebar.collapsed .sidebar-user-text {
+    display: none;
+}
+
+/* =============================================================================
+   CONTEUDO PRINCIPAL
+   ============================================================================= */
 #main-content {
     margin-left: 260px;
-    transition: all 0.3s ease;
+    transition: all 0.25s ease;
     min-height: 100vh;
 }
 
@@ -82,26 +171,166 @@
     margin-left: 70px;
 }
 
-/* CARDS */
+/* =============================================================================
+   CARTOES
+   ============================================================================= */
 .card {
     border: none;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    border-radius: 10px;
+    box-shadow: var(--shadow-card);
+    border-radius: var(--radius);
+    transition: box-shadow 0.15s ease;
 }
 
-/* BADGES DE GRAVIDADE */
-.badge-critica { background-color: #dc3545 !important; color: white; }
-.badge-alta    { background-color: #fd7e14 !important; color: white; }
-.badge-media   { background-color: #ffc107 !important; color: #000; }
-.badge-baixa   { background-color: #198754 !important; color: white; }
+.card-header {
+    background-color: transparent;
+    border-bottom: 1px solid var(--line);
+    font-weight: 600;
+    padding: 0.85rem 1.1rem;
+}
 
-/* FOOTER */
+.card-header h5, .card-header h6 {
+    text-transform: uppercase;
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    color: var(--ink-soft);
+    margin: 0;
+}
+.card-header h5 i, .card-header h6 i {
+    color: var(--brand);
+}
+
+/* cartoes clicaveis (hub de configuracao) ganham um lift subtil */
+a .card:hover, .card.card-hover:hover {
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-1px);
+}
+
+/* =============================================================================
+   TABELAS
+   ============================================================================= */
+.table {
+    --bs-table-border-color: var(--line);
+    font-size: 0.9rem;
+}
+
+.table thead.table-light th,
+.table > :not(caption) > * > th {
+    background-color: transparent;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    color: var(--ink-soft);
+    border-bottom: 1px solid var(--line);
+    padding-top: 0.9rem;
+    padding-bottom: 0.9rem;
+}
+
+.table td {
+    vertical-align: middle;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+.table-hover > tbody > tr:hover > * {
+    background-color: #f4f8ff;
+}
+
+/* =============================================================================
+   BOTOES
+   ============================================================================= */
+.btn {
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    transition: filter 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-primary {
+    background-color: var(--brand);
+    border-color: var(--brand);
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background-color: var(--brand-dark);
+    border-color: var(--brand-dark);
+}
+
+.btn:not(.btn-sm):not(.btn-link):hover {
+    filter: brightness(1.02);
+}
+
+/* =============================================================================
+   BADGES / PASTILHAS DE ESTADO
+   Bootstrap .badge fica sempre em pilula; as cores base (bg-success,
+   bg-danger, ...) ganham um tom suave em vez de preenchimento solido,
+   sem alterar a cor de origem — so o tratamento.
+   ============================================================================= */
+.badge {
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    padding: 0.4em 0.75em;
+}
+
+.badge.bg-success  { background-color: var(--chip-success-bg)  !important; color: var(--chip-success-ink)  !important; }
+.badge.bg-danger   { background-color: var(--chip-danger-bg)   !important; color: var(--chip-danger-ink)   !important; }
+.badge.bg-warning  { background-color: var(--chip-warning-bg)  !important; color: var(--chip-warning-ink)  !important; }
+.badge.bg-info     { background-color: var(--chip-info-bg)     !important; color: var(--chip-info-ink)     !important; }
+.badge.bg-primary  { background-color: var(--chip-info-bg)     !important; color: var(--chip-info-ink)     !important; }
+.badge.bg-secondary{ background-color: var(--chip-secondary-bg)!important; color: var(--chip-secondary-ink)!important; }
+
+/* BADGES DE GRAVIDADE — mesmo tratamento em pilula suave */
+.badge-critica { background-color: var(--chip-danger-bg)  !important; color: var(--chip-danger-ink)  !important; }
+.badge-alta    { background-color: var(--chip-warning-bg) !important; color: var(--chip-warning-ink) !important; }
+.badge-media   { background-color: #fdf3cf !important; color: #8a6d00 !important; }
+.badge-baixa   { background-color: var(--chip-success-bg) !important; color: var(--chip-success-ink) !important; }
+
+/* =============================================================================
+   FORMULARIOS
+   ============================================================================= */
+.form-control, .form-select {
+    border-radius: var(--radius-sm);
+    border-color: var(--line);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+
+.form-label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+}
+
+/* =============================================================================
+   BREADCRUMB
+   ============================================================================= */
+.breadcrumb {
+    font-size: 0.82rem;
+}
+
+/* =============================================================================
+   FOOTER
+   ============================================================================= */
 .footer {
     margin-top: auto;
+    border-top: 1px solid var(--line) !important;
 }
 
-/* GERAL */
-body {
-    font-family: 'Segoe UI', sans-serif;
-    font-size: 0.95rem;
+/* =============================================================================
+   ACESSIBILIDADE — estado de foco visivel, respeita reduced-motion
+   ============================================================================= */
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        transition-duration: 0.001ms !important;
+        animation-duration: 0.001ms !important;
+    }
 }
