@@ -132,6 +132,11 @@ a { text-decoration: none; }
     gap: 10px;
     cursor: pointer;
     transition: background 0.15s ease;
+    color: white; /* e um <a>, sem isto herdava o azul de link do Bootstrap */
+}
+
+.sidebar-user:hover {
+    color: white;
 }
 
 .sidebar-user:hover {
