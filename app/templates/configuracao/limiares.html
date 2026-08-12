@@ -52,7 +52,7 @@
                         {% endif %}
                     </td>
                     <td>
-                        <a href="{{ url_for('configuracao.editar_limiar', id=l.id_limiar) }}"
+                        <a href="{{ url_for('configuracao.editar_limiar', token=mascarar_id(l.id_limiar, 'limiar')) }}"
                            class="btn btn-sm btn-outline-primary">
                             <i class="bi bi-pencil"></i> Editar
                         </a>

@@ -112,6 +112,9 @@ def create_app():
     from app.routes.configuracao import config_bp
     app.register_blueprint(config_bp)
 
+    from app.utils import mascarar_id
+    app.jinja_env.globals['mascarar_id'] = mascarar_id
+
     from app import models
 
     return app

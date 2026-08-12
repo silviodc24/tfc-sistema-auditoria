@@ -12,6 +12,7 @@ from app.services.importacao import (
     importar_orcamentos,
     importar_aquisicoes
 )
+from app.utils import mascarar_id, obter_por_token
 
 config_bp = Blueprint('configuracao', __name__, url_prefix='/configuracao')
 
@@ -73,12 +74,15 @@ def regras():
     return render_template('configuracao/regras.html', regras=todas_regras)
 
 
-@config_bp.route('/regras/<int:id>/toggle', methods=['POST'])
+@config_bp.route('/regras/<token>/toggle', methods=['POST'])
 @login_required
-def toggle_regra(id):
+def toggle_regra(token):
     if not admin_required():
         return redirect(url_for('configuracao.regras'))
-    regra = RegraAuditoria.query.get_or_404(id)
+    regra = obter_por_token(RegraAuditoria, token, 'regra')
+    if regra is None:
+        flash('Ligação inválida.', 'danger')
+        return redirect(url_for('configuracao.regras'))
     regra.ativa = not regra.ativa
     db.session.commit()
     estado = 'activada' if regra.ativa else 'desactivada'
@@ -86,12 +90,15 @@ def toggle_regra(id):
     return redirect(url_for('configuracao.regras'))
 
 
-@config_bp.route('/regras/<int:id>/editar', methods=['GET', 'POST'])
+@config_bp.route('/regras/<token>/editar', methods=['GET', 'POST'])
 @login_required
-def editar_regra(id):
+def editar_regra(token):
     if not admin_required():
         return redirect(url_for('configuracao.regras'))
-    regra = RegraAuditoria.query.get_or_404(id)
+    regra = obter_por_token(RegraAuditoria, token, 'regra')
+    if regra is None:
+        flash('Ligação inválida.', 'danger')
+        return redirect(url_for('configuracao.regras'))
     if request.method == 'POST':
         valor = request.form.get('valor_referencia')
         regra.valor_referencia = float(valor) if valor else None
@@ -119,12 +126,15 @@ def limiares():
     return render_template('configuracao/limiares.html', limiares=todos_limiares)
 
 
-@config_bp.route('/limiares/<int:id>/editar', methods=['GET', 'POST'])
+@config_bp.route('/limiares/<token>/editar', methods=['GET', 'POST'])
 @login_required
-def editar_limiar(id):
+def editar_limiar(token):
     if not admin_required():
         return redirect(url_for('configuracao.regras'))
-    limiar = LimiarAutorizacao.query.get_or_404(id)
+    limiar = obter_por_token(LimiarAutorizacao, token, 'limiar')
+    if limiar is None:
+        flash('Ligação inválida.', 'danger')
+        return redirect(url_for('configuracao.limiares'))
     if request.method == 'POST':
         limiar.valor_minimo = float(request.form.get('valor_minimo'))
         valor_maximo = request.form.get('valor_maximo')
@@ -214,12 +224,15 @@ def novo_utilizador():
     return render_template('configuracao/novo_utilizador.html')
 
 
-@config_bp.route('/utilizadores/<int:id>/toggle', methods=['POST'])
+@config_bp.route('/utilizadores/<token>/toggle', methods=['POST'])
 @login_required
-def toggle_utilizador(id):
+def toggle_utilizador(token):
     if not admin_required():
         return redirect(url_for('configuracao.index'))
-    u = Utilizador.query.get_or_404(id)
+    u = obter_por_token(Utilizador, token, 'utilizador')
+    if u is None:
+        flash('Ligação inválida.', 'danger')
+        return redirect(url_for('configuracao.utilizadores'))
     if u.id_utilizador == current_user.id_utilizador:
         flash('Não pode desactivar a sua própria conta.', 'danger')
         return redirect(url_for('configuracao.utilizadores'))
@@ -234,16 +247,19 @@ def toggle_utilizador(id):
     return redirect(url_for('configuracao.utilizadores'))
 
 
-@config_bp.route('/utilizadores/<int:id>/editar', methods=['GET', 'POST'])
+@config_bp.route('/utilizadores/<token>/editar', methods=['GET', 'POST'])
 @login_required
-def editar_utilizador(id):
+def editar_utilizador(token):
     """
     Edicao de nome e perfil por um administrador — nunca da propria conta
     (segregacao de funcoes: precisa de ser outro administrador a faze-lo).
     """
     if not admin_required():
         return redirect(url_for('configuracao.index'))
-    u = Utilizador.query.get_or_404(id)
+    u = obter_por_token(Utilizador, token, 'utilizador')
+    if u is None:
+        flash('Ligação inválida.', 'danger')
+        return redirect(url_for('configuracao.utilizadores'))
     if u.id_utilizador == current_user.id_utilizador:
         flash('Não pode editar o seu próprio nome ou perfil — peça a outro administrador.', 'danger')
         return redirect(url_for('configuracao.utilizadores'))
@@ -268,9 +284,9 @@ def editar_utilizador(id):
     return render_template('configuracao/editar_utilizador.html', utilizador=u)
 
 
-@config_bp.route('/utilizadores/<int:id>/reset-password', methods=['POST'])
+@config_bp.route('/utilizadores/<token>/reset-password', methods=['POST'])
 @login_required
-def reset_password_utilizador(id):
+def reset_password_utilizador(token):
     """
     Repoe uma password temporaria definida pelo administrador — sem fluxo
     de recuperacao por token/email, e a forma de desbloquear alguem que
@@ -279,7 +295,10 @@ def reset_password_utilizador(id):
     """
     if not admin_required():
         return redirect(url_for('configuracao.index'))
-    u = Utilizador.query.get_or_404(id)
+    u = obter_por_token(Utilizador, token, 'utilizador')
+    if u is None:
+        flash('Ligação inválida.', 'danger')
+        return redirect(url_for('configuracao.utilizadores'))
     if u.id_utilizador == current_user.id_utilizador:
         flash('Não pode repor a sua própria password aqui — altere-a em "O Meu Perfil".', 'danger')
         return redirect(url_for('configuracao.utilizadores'))
@@ -288,7 +307,7 @@ def reset_password_utilizador(id):
     valida, erro = validar_politica_password(password_temporaria, u.nome, u.email)
     if not valida:
         flash(erro, 'danger')
-        return redirect(url_for('configuracao.editar_utilizador', id=u.id_utilizador))
+        return redirect(url_for('configuracao.editar_utilizador', token=mascarar_id(u.id_utilizador, 'utilizador')))
 
     u.set_password(password_temporaria)
     u.tentativas_falhadas = 0

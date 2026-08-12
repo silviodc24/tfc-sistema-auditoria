@@ -6,6 +6,7 @@ from app.services.motor_auditoria import executar_auditoria
 from flask import send_file
 from app.services.exportacao import gerar_pdf, gerar_excel
 from flask_login import login_required, current_user
+from app.utils import mascarar_id, obter_por_token
 
 auditoria_bp = Blueprint('auditoria', __name__, url_prefix='/auditoria')
 
@@ -71,7 +72,7 @@ def nova():
 
         if sucesso:
             flash(f'Auditoria concluída com sucesso.', 'success')
-            return redirect(url_for('auditoria.detalhe', id=auditoria.id_auditoria))
+            return redirect(url_for('auditoria.detalhe', token=mascarar_id(auditoria.id_auditoria, 'auditoria')))
         else:
             flash(f'Erro na auditoria: {mensagem}', 'danger')
             return render_template('auditoria/nova.html',
@@ -86,14 +87,17 @@ def nova():
 
 
 
-@auditoria_bp.route('/<int:id>/exportar/pdf')
+@auditoria_bp.route('/<token>/exportar/pdf')
 @login_required
-def exportar_pdf(id):
+def exportar_pdf(token):
     """Exporta o relatorio de auditoria em PDF."""
     if current_user.is_admin:
         flash('Acesso restrito a auditores.', 'warning')
         return redirect(url_for('main.index'))
-    auditoria = Auditoria.query.get_or_404(id)
+    auditoria = obter_por_token(Auditoria, token, 'auditoria')
+    if auditoria is None:
+        flash('Ligação inválida.', 'danger')
+        return redirect(url_for('auditoria.index'))
     buffer = gerar_pdf(auditoria)
     nome_ficheiro = f"auditoria_{auditoria.id_auditoria}_{auditoria.periodo_analisado}.pdf"
     return send_file(
@@ -104,14 +108,17 @@ def exportar_pdf(id):
     )
 
 
-@auditoria_bp.route('/<int:id>/exportar/excel')
+@auditoria_bp.route('/<token>/exportar/excel')
 @login_required
-def exportar_excel(id):
+def exportar_excel(token):
     """Exporta o relatorio de auditoria em Excel."""
     if current_user.is_admin:
         flash('Acesso restrito a auditores.', 'warning')
         return redirect(url_for('main.index'))
-    auditoria = Auditoria.query.get_or_404(id)
+    auditoria = obter_por_token(Auditoria, token, 'auditoria')
+    if auditoria is None:
+        flash('Ligação inválida.', 'danger')
+        return redirect(url_for('auditoria.index'))
     buffer = gerar_excel(auditoria)
     nome_ficheiro = f"auditoria_{auditoria.id_auditoria}_{auditoria.periodo_analisado}.xlsx"
     return send_file(
@@ -122,12 +129,15 @@ def exportar_excel(id):
     )
 
 
-@auditoria_bp.route('/<int:id>')
+@auditoria_bp.route('/<token>')
 @login_required
-def detalhe(id):
+def detalhe(token):
     """Mostra o detalhe de uma sessao de auditoria."""
     if current_user.is_admin:
         flash('Acesso restrito a auditores.', 'warning')
         return redirect(url_for('main.index'))
-    auditoria = Auditoria.query.get_or_404(id)
+    auditoria = obter_por_token(Auditoria, token, 'auditoria')
+    if auditoria is None:
+        flash('Ligação inválida.', 'danger')
+        return redirect(url_for('auditoria.index'))
     return render_template('auditoria/detalhe.html', auditoria=auditoria)

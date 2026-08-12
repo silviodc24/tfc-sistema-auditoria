@@ -62,7 +62,7 @@
                     ao utilizador; ele(a) deve trocá-la por uma pessoal assim que conseguir entrar.
                 </p>
                 <form method="POST"
-                      action="{{ url_for('configuracao.reset_password_utilizador', id=utilizador.id_utilizador) }}"
+                      action="{{ url_for('configuracao.reset_password_utilizador', token=mascarar_id(utilizador.id_utilizador, 'utilizador')) }}"
                       id="form-reset-password">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">

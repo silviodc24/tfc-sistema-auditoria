@@ -3,6 +3,7 @@ from app import db
 from app.models.nao_conformidade import NaoConformidade
 from app.models.regra_auditoria import RegraAuditoria
 from flask_login import login_required, current_user
+from app.utils import obter_por_token
 
 nc_bp = Blueprint('nao_conformidade', __name__, url_prefix='/nao-conformidades')
 
@@ -42,14 +43,17 @@ def index():
     )
 
 
-@nc_bp.route('/<int:id>/actualizar', methods=['POST'])
+@nc_bp.route('/<token>/actualizar', methods=['POST'])
 @login_required
-def actualizar(id):
+def actualizar(token):
     """Actualiza o status e comentario de uma nao conformidade."""
     if current_user.is_admin:
         flash('Acesso restrito a auditores.', 'warning')
         return redirect(url_for('main.index'))
-    nc = NaoConformidade.query.get_or_404(id)
+    nc = obter_por_token(NaoConformidade, token, 'nao_conformidade')
+    if nc is None:
+        flash('Ligação inválida.', 'danger')
+        return redirect(url_for('nao_conformidade.index'))
     novo_status = request.form.get('status')
     comentario = request.form.get('comentario_auditor')
 

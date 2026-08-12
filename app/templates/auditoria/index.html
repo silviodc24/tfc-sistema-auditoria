@@ -49,7 +49,7 @@
                         {% endif %}
                     </td>
                     <td>
-                        <a href="{{ url_for('auditoria.detalhe', id=a.id_auditoria) }}"
+                        <a href="{{ url_for('auditoria.detalhe', token=mascarar_id(a.id_auditoria, 'auditoria')) }}"
                            class="btn btn-sm btn-outline-primary">
                             <i class="bi bi-eye"></i> Ver
                         </a>

@@ -59,12 +59,12 @@
                     </td>
                     {% if current_user.is_admin %}
                     <td class="d-flex gap-2">
-                        <a href="{{ url_for('configuracao.editar_regra', id=r.id_regra) }}"
+                        <a href="{{ url_for('configuracao.editar_regra', token=mascarar_id(r.id_regra, 'regra')) }}"
                            class="btn btn-sm btn-outline-primary">
                             <i class="bi bi-pencil"></i>
                         </a>
                         <form method="POST"
-                              action="{{ url_for('configuracao.toggle_regra', id=r.id_regra) }}"
+                              action="{{ url_for('configuracao.toggle_regra', token=mascarar_id(r.id_regra, 'regra')) }}"
                               {% if r.ativa %}class="form-confirmar-desactivacao" data-codigo="{{ r.codigo }}"{% endif %}>
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <button type="submit"
