@@ -55,9 +55,19 @@
                             caracter especial. Não pode conter o nome ou o email.
                         </div>
                     </div>
+                    {% if pedir_confirmacao_homonimo %}
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="confirmar_homonimo"
+                               value="1" id="confirmarHomonimo" required>
+                        <label class="form-check-label" for="confirmarHomonimo">
+                            Confirmo que é uma pessoa diferente e quero criar esta conta mesmo assim.
+                        </label>
+                    </div>
+                    {% endif %}
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-check-lg"></i> Criar Utilizador
+                            <i class="bi bi-check-lg"></i>
+                            {% if pedir_confirmacao_homonimo %}Confirmar e Criar{% else %}Criar Utilizador{% endif %}
                         </button>
                         <a href="{{ url_for('configuracao.utilizadores') }}"
                            class="btn btn-outline-secondary">Cancelar</a>

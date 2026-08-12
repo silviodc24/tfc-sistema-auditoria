@@ -171,14 +171,16 @@ def novo_utilizador():
                                     nome=nome, email=email, perfil=perfil)
 
         # Aviso nao-bloqueante: nome nao e chave de negocio — duas pessoas
-        # podem legitimamente chamar-se igual. So avisa e sugere um email
-        # diferenciado (padrao usado por Google Workspace/Microsoft 365),
-        # nunca impede a criacao.
+        # podem legitimamente chamar-se igual. Pede confirmacao explicita
+        # antes de criar (nao depois), e sugere um email diferenciado
+        # (padrao usado por Google Workspace/Microsoft 365).
         homonimo_activo = Utilizador.query.filter(
             db.func.lower(Utilizador.nome) == nome.lower(),
             Utilizador.ativo == True
         ).first()
-        if homonimo_activo:
+        confirmar_homonimo = request.form.get('confirmar_homonimo') == '1'
+
+        if homonimo_activo and not confirmar_homonimo:
             local, dominio = email.split('@', 1)
             sufixo = 2
             email_sugerido = f'{local}{sufixo}@{dominio}'
@@ -186,11 +188,15 @@ def novo_utilizador():
                 sufixo += 1
                 email_sugerido = f'{local}{sufixo}@{dominio}'
             flash(
-                f'Atenção: já existe um utilizador activo chamado "{nome}" '
-                f'({homonimo_activo.email}). Se forem pessoas diferentes, considere '
-                f'um email diferenciado, por exemplo "{email_sugerido}".',
+                f'Já existe um utilizador activo chamado "{nome}" '
+                f'({homonimo_activo.email}). Se forem pessoas diferentes, pode usar '
+                f'um email diferenciado, por exemplo "{email_sugerido}", e confirmar '
+                f'abaixo que quer criar mesmo assim.',
                 'warning'
             )
+            return render_template('configuracao/novo_utilizador.html',
+                                    nome=nome, email=email, perfil=perfil,
+                                    pedir_confirmacao_homonimo=True)
 
         valida, erro = validar_politica_password(password, nome, email)
         if not valida:
