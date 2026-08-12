@@ -15,6 +15,8 @@ from app.services.importacao import (
 
 config_bp = Blueprint('configuracao', __name__, url_prefix='/configuracao')
 
+DOMINIO_EMAIL_PERMITIDO = '@ns-aplicacao.ao'
+
 
 def validar_politica_password(password, nome='', email=''):
     """Valida a password contra a politica minima do sistema.
@@ -153,15 +155,42 @@ def novo_utilizador():
     if not admin_required():
         return redirect(url_for('configuracao.index'))
     if request.method == 'POST':
-        nome = request.form.get('nome')
-        email = request.form.get('email')
+        nome = request.form.get('nome', '').strip()
+        email = request.form.get('email', '').strip().lower()
         perfil = request.form.get('perfil')
         password = request.form.get('password')
+
+        if not email.endswith(DOMINIO_EMAIL_PERMITIDO):
+            flash(f'O email tem de pertencer ao domínio "{DOMINIO_EMAIL_PERMITIDO}".', 'danger')
+            return render_template('configuracao/novo_utilizador.html',
+                                    nome=nome, email=email, perfil=perfil)
 
         if Utilizador.query.filter_by(email=email).first():
             flash('Já existe um utilizador com este email.', 'danger')
             return render_template('configuracao/novo_utilizador.html',
                                     nome=nome, email=email, perfil=perfil)
+
+        # Aviso nao-bloqueante: nome nao e chave de negocio — duas pessoas
+        # podem legitimamente chamar-se igual. So avisa e sugere um email
+        # diferenciado (padrao usado por Google Workspace/Microsoft 365),
+        # nunca impede a criacao.
+        homonimo_activo = Utilizador.query.filter(
+            db.func.lower(Utilizador.nome) == nome.lower(),
+            Utilizador.ativo == True
+        ).first()
+        if homonimo_activo:
+            local, dominio = email.split('@', 1)
+            sufixo = 2
+            email_sugerido = f'{local}{sufixo}@{dominio}'
+            while Utilizador.query.filter_by(email=email_sugerido).first():
+                sufixo += 1
+                email_sugerido = f'{local}{sufixo}@{dominio}'
+            flash(
+                f'Atenção: já existe um utilizador activo chamado "{nome}" '
+                f'({homonimo_activo.email}). Se forem pessoas diferentes, considere '
+                f'um email diferenciado, por exemplo "{email_sugerido}".',
+                'warning'
+            )
 
         valida, erro = validar_politica_password(password, nome, email)
         if not valida:
@@ -231,6 +260,39 @@ def editar_utilizador(id):
         return redirect(url_for('configuracao.utilizadores'))
 
     return render_template('configuracao/editar_utilizador.html', utilizador=u)
+
+
+@config_bp.route('/utilizadores/<int:id>/reset-password', methods=['POST'])
+@login_required
+def reset_password_utilizador(id):
+    """
+    Repoe uma password temporaria definida pelo administrador — sem fluxo
+    de recuperacao por token/email, e a forma de desbloquear alguem que
+    esqueceu a password. O utilizador deve troca-la em "O Meu Perfil"
+    assim que conseguir entrar. Nunca aplicavel a propria conta do admin.
+    """
+    if not admin_required():
+        return redirect(url_for('configuracao.index'))
+    u = Utilizador.query.get_or_404(id)
+    if u.id_utilizador == current_user.id_utilizador:
+        flash('Não pode repor a sua própria password aqui — altere-a em "O Meu Perfil".', 'danger')
+        return redirect(url_for('configuracao.utilizadores'))
+
+    password_temporaria = request.form.get('password_temporaria', '')
+    valida, erro = validar_politica_password(password_temporaria, u.nome, u.email)
+    if not valida:
+        flash(erro, 'danger')
+        return redirect(url_for('configuracao.editar_utilizador', id=u.id_utilizador))
+
+    u.set_password(password_temporaria)
+    u.tentativas_falhadas = 0
+    db.session.commit()
+    flash(
+        f'Password de {u.nome} reposta com sucesso. Informe-o(a) da password '
+        f'temporária para que a altere em "O Meu Perfil" assim que entrar.',
+        'success'
+    )
+    return redirect(url_for('configuracao.utilizadores'))
 
 
 # =============================================================================

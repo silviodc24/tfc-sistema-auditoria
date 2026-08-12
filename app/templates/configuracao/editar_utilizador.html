@@ -37,10 +37,6 @@
                             <option value="administrador" {% if utilizador.perfil == 'administrador' %}selected{% endif %}>Administrador</option>
                         </select>
                     </div>
-                    <div class="form-text mb-3">
-                        A password é da responsabilidade do próprio utilizador —
-                        gerida em "O Meu Perfil", não aqui.
-                    </div>
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-check-lg"></i> Guardar
@@ -52,6 +48,55 @@
                 </form>
             </div>
         </div>
+
+        <!-- REPOR PASSWORD -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-key"></i> Repor Password</h6>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small">
+                    Normalmente a password só pode ser alterada pelo próprio utilizador,
+                    em "O Meu Perfil". Esta opção existe só para desbloquear alguém que
+                    esqueceu a password. Defina aqui uma password temporária e comunique-a
+                    ao utilizador; ele(a) deve trocá-la por uma pessoal assim que conseguir entrar.
+                </p>
+                <form method="POST"
+                      action="{{ url_for('configuracao.reset_password_utilizador', id=utilizador.id_utilizador) }}"
+                      id="form-reset-password">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label class="form-label">Password temporária</label>
+                        <input type="text"
+                               class="form-control"
+                               name="password_temporaria"
+                               minlength="10"
+                               required>
+                        <div class="form-text">
+                            Mínimo 10 caracteres, com maiúscula, minúscula, dígito e
+                            caracter especial. Fica visível ao escrever, para a poder
+                            comunicar ao utilizador.
+                        </div>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="bi bi-key"></i> Repor Password
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script nonce="{{ csp_nonce }}">
+    // Confirmacao antes de repor a password (CSP bloqueia onsubmit inline)
+    document.getElementById('form-reset-password').addEventListener('submit', function(e) {
+        if (!confirm('Repor a password deste utilizador? A password actual dele(a) deixa de funcionar de imediato.')) {
+            e.preventDefault();
+        }
+    });
+</script>
 {% endblock %}
