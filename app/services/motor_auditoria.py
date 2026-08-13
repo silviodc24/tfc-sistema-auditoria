@@ -86,6 +86,13 @@ def buscar_saldo_disponivel(aquisicao):
     if not orcamento:
         return None
 
+    # Sem data de aprovacao (aquisicao ainda pendente) nao ha "momento da
+    # aprovacao" para calcular o saldo sequencial — e alem disso o SQLAlchemy
+    # nao permite comparar uma coluna com None usando <=, so devolve None
+    # (RN01 nao dispara para esta aquisicao, tal como quando falta orcamento).
+    if aquisicao.data_aprovacao is None:
+        return None
+
     # Soma das aquisicoes aprovadas antes desta — mesma ordem cronologica
     total_anteriores = db.session.query(
         db.func.sum(Aquisicao.valor)
