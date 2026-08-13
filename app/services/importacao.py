@@ -316,22 +316,49 @@ def importar_aquisicoes(ficheiro):
                     erros.append(f"Linha {i}: aprovador id={id_aprovador} não encontrado.")
                     continue
 
-                a = Aquisicao(
-                    id_centro=centro.id_centro,
-                    id_orcamento=orcamento.id_orcamento,
-                    id_solicitante=solicitante.id_colaborador,
-                    id_aprovador=aprovador.id_colaborador,
-                    data_solicitacao=data_solicitacao,
-                    data_aprovacao=data_aprovacao,
-                    valor=valor,
-                    descricao=descricao,
-                    tipo_aquisicao=tipo_aquisicao,
-                    documento_referencia=documento_referencia,
-                    status_aprovacao=status_aprovacao,
-                    origem_dado=origem_dado,
-                    confirmacao_recepcao=confirmacao_recepcao
-                )
-                db.session.add(a)
+                # documento_referencia identifica univocamente o documento de
+                # origem (ex: numero de factura/nota de encomenda). Quando
+                # presente, reimportar a mesma referencia actualiza o registo
+                # existente em vez de criar um duplicado — sem isso, cada
+                # reimportacao do mesmo CSV duplicava a aquisicao e inflacionava
+                # a despesa considerada no saldo da RN01.
+                existente = None
+                if documento_referencia:
+                    existente = Aquisicao.query.filter_by(
+                        documento_referencia=documento_referencia
+                    ).first()
+
+                if existente:
+                    existente.id_centro = centro.id_centro
+                    existente.id_orcamento = orcamento.id_orcamento
+                    existente.id_solicitante = solicitante.id_colaborador
+                    existente.id_aprovador = aprovador.id_colaborador
+                    existente.data_solicitacao = data_solicitacao
+                    existente.data_aprovacao = data_aprovacao
+                    existente.valor = valor
+                    existente.descricao = descricao
+                    existente.tipo_aquisicao = tipo_aquisicao
+                    existente.status_aprovacao = status_aprovacao
+                    existente.origem_dado = origem_dado
+                    existente.confirmacao_recepcao = confirmacao_recepcao
+                else:
+                    a = Aquisicao(
+                        id_centro=centro.id_centro,
+                        id_orcamento=orcamento.id_orcamento,
+                        id_solicitante=solicitante.id_colaborador,
+                        id_aprovador=aprovador.id_colaborador,
+                        data_solicitacao=data_solicitacao,
+                        data_aprovacao=data_aprovacao,
+                        valor=valor,
+                        descricao=descricao,
+                        tipo_aquisicao=tipo_aquisicao,
+                        documento_referencia=documento_referencia,
+                        status_aprovacao=status_aprovacao,
+                        origem_dado=origem_dado,
+                        confirmacao_recepcao=confirmacao_recepcao
+                    )
+                    db.session.add(a)
+
                 total += 1
 
             except Exception as e:
