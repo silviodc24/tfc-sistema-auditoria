@@ -515,11 +515,11 @@ def admin_required():
 
 Esta é uma decisão arquitectural deliberada. O `Utilizador` é a entidade do sistema de auditoria — quem acede à plataforma. O `Colaborador` é importado do ERP — quem solicita e aprova aquisições. Um auditor do sistema pode ser uma pessoa completamente diferente dos colaboradores da organização auditada.
 
-### Limitações de segurança conhecidas (MVP)
+### Medidas de segurança implementadas
 
-- **CSRF:** Não implementado nesta versão. Requer Flask-WTF em versão de produção.
-- **Rate limiting:** Login não tem limite de tentativas. Requer Flask-Limiter.
-- **Headers HTTP:** Sem `X-Frame-Options`, `Content-Security-Policy`. Requer Flask-Talisman.
+- **CSRF:** Protegido via Flask-WTF (`CSRFProtect`) em todos os formulários.
+- **Rate limiting:** Login com limite de tentativas via Flask-Limiter, com bloqueio de conta após tentativas falhadas repetidas.
+- **Headers HTTP:** `X-Frame-Options: DENY` e `Content-Security-Policy` (com nonce por pedido) aplicados em todas as respostas.
 
 ---
 
@@ -765,10 +765,6 @@ Esta é a decisão arquitectural mais importante. Manter as regras na base de da
 
 A alternativa seria verificar se o total de aquisições do período cabe no orçamento — mas isso não reflecte a realidade. O auditor precisa de saber em que momento o saldo se esgotou, não apenas se o total excede o orçamento. A lógica sequencial por `data_aprovacao` responde exactamente a essa questão.
 
-### Porquê não implementar CSRF nesta versão?
-
-O sistema é um MVP académico desenvolvido em ambiente controlado com utilizadores conhecidos. A implementação de CSRF com Flask-WTF é uma melhoria de segurança documentada para versões futuras — não uma falha de design mas uma decisão consciente de scope do MVP.
-
 ---
 
 ## 12. Limitações e Trabalho Futuro
@@ -777,9 +773,6 @@ O sistema é um MVP académico desenvolvido em ambiente controlado com utilizado
 
 | Limitação | Impacto | Versão Futura |
 |---|---|---|
-| Sem protecção CSRF | Segurança — vulnerável a ataques externos | Flask-WTF |
-| Sem rate limiting no login | Segurança — força bruta possível | Flask-Limiter |
-| Sem headers de segurança HTTP | Segurança — XSS e clickjacking | Flask-Talisman |
 | `valor_executado` não actualizado dinamicamente | Precisão do saldo | Recálculo automático |
 | Sem paginação nas listagens | Performance com grandes volumes | Flask-SQLAlchemy pagination |
 | Sem log de acções dos utilizadores | Auditabilidade do sistema | Tabela de audit log |
