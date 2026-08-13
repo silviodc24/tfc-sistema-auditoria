@@ -205,7 +205,29 @@ def importar_orcamentos(ficheiro):
 
                 if existente:
                     existente.valor_orcado = valor_orcado
-                    existente.valor_executado = valor_executado or Decimal('0')
+
+                    # valor_executado representa despesa historica anterior a
+                    # este sistema (ex: ERP). Uma vez que o orcamento ja tem
+                    # aquisicoes registadas aqui, reescreve-lo causaria dupla
+                    # contagem no calculo de saldo da RN01 — essa despesa
+                    # ficaria contada tanto em valor_executado como na soma
+                    # das aquisicoes. So aceita a alteracao enquanto o
+                    # orcamento ainda nao tiver aquisicoes associadas.
+                    tem_aquisicoes = Aquisicao.query.filter_by(
+                        id_orcamento=existente.id_orcamento
+                    ).first() is not None
+
+                    if tem_aquisicoes:
+                        novo_valor_executado = valor_executado or Decimal('0')
+                        if novo_valor_executado != existente.valor_executado:
+                            erros.append(
+                                f"Linha {i}: valor_executado não foi actualizado — o orçamento "
+                                f"id={existente.id_orcamento} já tem aquisições registadas; "
+                                f"alterá-lo causaria dupla contagem no saldo (RN01). "
+                                f"Valor mantido: {existente.valor_executado}."
+                            )
+                    else:
+                        existente.valor_executado = valor_executado or Decimal('0')
                 else:
                     o = Orcamento(
                         id_centro=centro.id_centro,
