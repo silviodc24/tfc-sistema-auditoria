@@ -782,7 +782,6 @@ O sistema é um MVP académico desenvolvido em ambiente controlado com utilizado
 | Sem headers de segurança HTTP | Segurança — XSS e clickjacking | Flask-Talisman |
 | `valor_executado` não actualizado dinamicamente | Precisão do saldo | Recálculo automático |
 | Sem paginação nas listagens | Performance com grandes volumes | Flask-SQLAlchemy pagination |
-| Query N+1 no dashboard | Performance | Query com GROUP BY |
 | Sem log de acções dos utilizadores | Auditabilidade do sistema | Tabela de audit log |
 
 ### Funcionalidades para versões futuras
