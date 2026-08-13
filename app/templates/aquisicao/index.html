@@ -11,7 +11,7 @@
 <div class="card mb-4">
     <div class="card-body">
         <form method="GET" class="row g-3" id="form-filtros">
-            <div class="col-md-4">
+            <div class="col-md-5">
                 <label class="form-label">Centro de Custo</label>
                 <select class="form-select" name="id_centro">
                     <option value="">Todos</option>
@@ -23,7 +23,7 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-5">
                 <label class="form-label">Período</label>
                 <select class="form-select" name="periodo">
                     <option value="">Todos</option>
@@ -33,15 +33,6 @@
                             {{ o.periodo }}
                         </option>
                     {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Status</label>
-                <select class="form-select" name="status">
-                    <option value="">Todos</option>
-                    <option value="aprovado" {% if filtro_status == 'aprovado' %}selected{% endif %}>Aprovado</option>
-                    <option value="pendente" {% if filtro_status == 'pendente' %}selected{% endif %}>Pendente</option>
-                    <option value="rejeitado" {% if filtro_status == 'rejeitado' %}selected{% endif %}>Rejeitado</option>
                 </select>
             </div>
             <div class="col-md-2 d-flex align-items-end">
@@ -79,7 +70,6 @@
                         <th>Valor (Kz)</th>
                         <th>Data Solicitação</th>
                         <th>Data Aprovação</th>
-                        <th>Status</th>
                         <th>Tipo</th>
                     </tr>
                 </thead>
@@ -108,15 +98,6 @@
                             {% endif %}
                         </td>
                         <td>
-                            {% if a.status_aprovacao == 'aprovado' %}
-                                <span class="badge bg-success">Aprovado</span>
-                            {% elif a.status_aprovacao == 'pendente' %}
-                                <span class="badge bg-warning text-dark">Pendente</span>
-                            {% else %}
-                                <span class="badge bg-danger">Rejeitado</span>
-                            {% endif %}
-                        </td>
-                        <td>
                             {% if a.tipo_aquisicao == 'bem' %}
                                 <span class="badge bg-info text-dark">Bem</span>
                             {% else %}
@@ -128,7 +109,7 @@
 
                     {% if not aquisicoes %}
                     <tr>
-                        <td colspan="9" class="text-center text-muted py-4">
+                        <td colspan="8" class="text-center text-muted py-4">
                             <i class="bi bi-inbox fs-3"></i>
                             <p class="mt-2">Nenhuma aquisição encontrada.</p>
                         </td>

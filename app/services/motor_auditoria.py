@@ -229,9 +229,12 @@ def executar_auditoria(auditoria, ids_aquisicao):
         # Busca a regra RN05 para usar nos limiares de RN05 e RN06
         regra_rn05 = RegraAuditoria.query.filter_by(codigo='RN05').first()
 
-        # Busca apenas as aquisicoes seleccionadas pelo auditor
+        # Busca apenas as aquisicoes seleccionadas pelo auditor. O sistema e
+        # post hoc — so avalia aquisicoes ja aprovadas, mesmo que um id de
+        # aquisicao pendente/rejeitada chegue aqui por fora da UI de seleccao.
         aquisicoes = Aquisicao.query.filter(
-            Aquisicao.id_aquisicao.in_(ids_aquisicao)
+            Aquisicao.id_aquisicao.in_(ids_aquisicao),
+            Aquisicao.status_aprovacao == 'aprovado'
         ).order_by(Aquisicao.data_aprovacao.asc()).all()
 
         total_transacoes = len(aquisicoes)

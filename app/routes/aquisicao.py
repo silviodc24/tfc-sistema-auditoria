@@ -16,18 +16,16 @@ def index():
         return redirect(url_for('main.index'))
     id_centro = request.args.get('id_centro', '')
     periodo = request.args.get('periodo', '')
-    status = request.args.get('status', '')
 
-    query = Aquisicao.query
+    # O sistema e post hoc: so faz sentido auditar aquisicoes ja aprovadas
+    # (pendentes ainda nao foram pagas/executadas, rejeitadas nunca o serao).
+    query = Aquisicao.query.filter_by(status_aprovacao='aprovado')
 
     if id_centro:
         query = query.filter_by(id_centro=id_centro)
 
     if periodo:
         query = query.join(Orcamento).filter(Orcamento.periodo == periodo)
-
-    if status:
-        query = query.filter_by(status_aprovacao=status)
 
     aquisicoes = query.order_by(Aquisicao.data_solicitacao.asc()).all()
     centros = CentroCusto.query.filter_by(ativo=True).all()
@@ -38,7 +36,6 @@ def index():
         centros=centros,
         orcamentos=orcamentos,
         filtro_centro=id_centro,
-        filtro_periodo=periodo,
-        filtro_status=status
+        filtro_periodo=periodo
     )
 
